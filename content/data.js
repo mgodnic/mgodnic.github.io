@@ -78,7 +78,7 @@ window.SITE = {
     ],
     origin: [
       "I'm from a small town near Trieste, on the Karst — vineyards and olive trees, rocky ground, sea views, Mediterranean summers. I feel more Italian than Slovenian. Italian culture was strong in my family and in the region, and I grew up on Italian television, books, music and film. Rome and Milan only made it stronger. If pressed, I'd call myself Friulano before either.",
-      "I played guitar, and I'm learning piano. I used to DJ house and record sets. I built and repaired computers, which is how I earned my first money. I was a curious child who couldn't choose, so I studied journalism — the one subject that let me be curious about several things at once.",
+      "I played guitar, and I'm learning piano. I used to DJ and record house music sets. I built and repaired computers, which is how I earned my first money. I was a curious child who couldn't choose, so I studied journalism — the one subject that let me be curious about several things at once. My second option was architecture.",
       "I know a little about everything and not much in depth. What I have instead is resourcefulness, the whole picture, and the ability to see the finished thing before anyone else does."
     ],
     method: {
