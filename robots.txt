@@ -1,0 +1,7 @@
+# Lenses are unlisted — they are sent to one employer, not published.
+User-agent: *
+Allow: /
+Disallow: /for.html
+Disallow: /wireframes.html
+
+Sitemap: https://mgodnic.github.io/sitemap.xml

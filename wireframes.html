@@ -1,0 +1,345 @@
+<title>Layers &amp; Lenses</title>
+<style>
+  :root{
+    --paper:#F1F0EC; --panel:#E7E6E0; --ink:#191917; --muted:#6B6A64;
+    --hair:#D3D2CB; --accent:#701A1C; --accent-soft:#F0E2E1;
+    --grot:"Helvetica Neue",Helvetica,Arial,sans-serif;
+    --serif:"Iowan Old Style","Hoefler Text",Palatino,Georgia,serif;
+    --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+    --measure:66ch;
+  }
+  @media (prefers-color-scheme:dark){
+    :root:not([data-theme="light"]){
+      --paper:#131311; --panel:#1B1B18; --ink:#E9E8E2; --muted:#8E8D86;
+      --hair:#2E2E2A; --accent:#C86A6A; --accent-soft:#2A1A1A;
+    }
+  }
+  :root[data-theme="dark"]{
+    --paper:#131311; --panel:#1B1B18; --ink:#E9E8E2; --muted:#8E8D86;
+    --hair:#2E2E2A; --accent:#C86A6A; --accent-soft:#2A1A1A;
+  }
+
+  *{box-sizing:border-box;}
+  body{
+    background:var(--paper); color:var(--ink);
+    font-family:var(--grot); font-size:16px; line-height:1.55;
+    -webkit-font-smoothing:antialiased; margin:0;
+    padding:clamp(24px,5vw,72px) clamp(20px,5vw,64px) 120px;
+  }
+  .wrap{max-width:1180px;margin:0 auto;}
+
+  /* ---------- masthead ---------- */
+  .mast{border-top:2px solid var(--ink);padding-top:18px;margin-bottom:64px;}
+  .kicker{
+    font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--muted);display:flex;flex-wrap:wrap;gap:18px;margin-bottom:36px;
+  }
+  h1{
+    font-family:var(--grot);font-weight:700;letter-spacing:-.035em;line-height:.94;
+    font-size:clamp(44px,8.5vw,104px);margin:0 0 24px;text-wrap:balance;
+  }
+  .thesis{
+    font-family:var(--serif);font-style:italic;font-size:clamp(20px,2.5vw,29px);
+    line-height:1.32;max-width:24ch;margin:0 0 8px;
+  }
+  .thesis-en{font-family:var(--serif);font-size:clamp(15px,1.6vw,18px);color:var(--muted);max-width:34ch;margin:0;}
+
+  /* ---------- sections ---------- */
+  section{
+    display:grid;grid-template-columns:120px minmax(0,1fr);gap:0 32px;
+    border-top:1px solid var(--hair);padding:44px 0 8px;
+  }
+  .num{
+    font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--accent);padding-top:5px;
+  }
+  .body{max-width:var(--measure);}
+  .body.wide{max-width:none;}
+  h2{font-size:clamp(22px,2.6vw,31px);font-weight:700;letter-spacing:-.02em;margin:0 0 18px;text-wrap:balance;}
+  h3{font-size:16px;font-weight:700;letter-spacing:-.005em;margin:32px 0 10px;}
+  p{margin:0 0 15px;}
+  .lede{font-size:18px;line-height:1.5;}
+  strong{font-weight:700;}
+  em{font-style:italic;}
+  code{font-family:var(--mono);font-size:.86em;background:var(--panel);padding:1px 5px;}
+  a{color:var(--accent);}
+
+  /* ---------- layer table ---------- */
+  .layers{display:flex;flex-direction:column;gap:1px;background:var(--hair);border:1px solid var(--hair);margin:8px 0 4px;}
+  .layer{background:var(--paper);padding:18px 20px;display:grid;grid-template-columns:74px minmax(0,1fr) minmax(0,1.05fr);gap:20px;align-items:start;}
+  .layer-n{font-family:var(--mono);font-size:11px;letter-spacing:.1em;color:var(--accent);padding-top:3px;}
+  .layer-t{font-weight:700;}
+  .layer-d{color:var(--muted);font-size:14.5px;}
+  @media(max-width:720px){.layer{grid-template-columns:1fr;gap:6px;}}
+
+  /* ---------- wireframes ---------- */
+  .frames{display:grid;grid-template-columns:repeat(auto-fit,minmax(310px,1fr));gap:36px 30px;margin-top:8px;}
+  .frame{min-width:0;}
+  .frame-head{display:flex;align-items:baseline;gap:10px;border-bottom:1.5px solid var(--ink);padding-bottom:7px;margin-bottom:14px;flex-wrap:wrap;}
+  .frame-url{font-family:var(--mono);font-size:12px;font-weight:700;}
+  .frame-name{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-left:auto;}
+  .screen{border:1px solid var(--hair);background:var(--panel);padding:9px;display:flex;flex-direction:column;gap:7px;}
+  .blk{
+    border:1px solid var(--hair);background:var(--paper);padding:9px 10px;
+    font-family:var(--mono);font-size:10.5px;line-height:1.42;color:var(--muted);
+  }
+  .blk b{display:block;color:var(--ink);font-weight:700;letter-spacing:.06em;text-transform:uppercase;font-size:9.5px;margin-bottom:3px;}
+  .blk.tall{padding-top:24px;padding-bottom:24px;}
+  .blk.key{border-color:var(--accent);background:var(--accent-soft);}
+  .blk.key b{color:var(--accent);}
+  .blk.ghost{border-style:dashed;background:transparent;}
+  .row{display:grid;grid-template-columns:1fr 1fr;gap:7px;}
+  .row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;}
+  .note{font-family:var(--mono);font-size:11px;color:var(--muted);margin-top:9px;line-height:1.5;}
+
+  /* ---------- work list ---------- */
+  table{width:100%;border-collapse:collapse;font-size:14px;}
+  .scroll{overflow-x:auto;}
+  th{
+    font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;
+    color:var(--muted);text-align:left;font-weight:400;padding:0 14px 8px 0;border-bottom:1px solid var(--ink);white-space:nowrap;
+  }
+  td{padding:11px 14px 11px 0;border-bottom:1px solid var(--hair);vertical-align:top;}
+  td.yr{font-family:var(--mono);font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap;}
+  td.tt{font-weight:700;}
+  .tag{
+    font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;
+    border:1px solid var(--hair);padding:2px 6px;color:var(--muted);white-space:nowrap;display:inline-block;
+  }
+  .tag.on{border-color:var(--accent);color:var(--accent);}
+
+  ul{margin:0 0 15px;padding-left:19px;}
+  li{margin-bottom:7px;}
+  .flag{border-left:2px solid var(--accent);padding:2px 0 2px 16px;margin:20px 0;}
+  .flag p:last-child{margin-bottom:0;}
+  footer{border-top:2px solid var(--ink);margin-top:64px;padding-top:16px;
+    font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);
+    display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;}
+  @media(max-width:760px){
+    section{grid-template-columns:1fr;gap:0;}
+    .num{padding-top:0;margin-bottom:12px;}
+  }
+</style>
+
+<div class="wrap">
+
+<div class="mast">
+  <div class="kicker">
+    <span>Mitja Godnic</span><span>Site architecture &amp; wireframes</span><span>Draft 01 — for approval</span>
+  </div>
+  <h1>Layers<br>&amp; Lenses</h1>
+  <p class="thesis">“Vedno vidim konec še preden se lotim projekta.”</p>
+  <p class="thesis-en">I always see the end before I begin. The thesis of the site, and the reason the whole chain — idea, art concept, production, post, distribution — holds together in one person.</p>
+</div>
+
+<section>
+  <div class="num">01 / Position</div>
+  <div class="body">
+    <h2>What a stranger understands in eight seconds</h2>
+    <p class="lede"><strong>Mitja Godnic — Art Director and Executive Producer.</strong></p>
+    <p>Co-founder and partner of Top Stories, a design, communication and production studio, 2018–2026. Work for museums, cultural institutions and public bodies — the Museum of Madness, the International Centre of Graphic Arts, the Ministry of Culture. Trained as a journalist. Friulano, from the Karst above Trieste.</p>
+    <div class="flag">
+      <p><strong>What the site deliberately does not lead with.</strong> Novartis, Roche, SAP, IBM, NLB, Triglav, Mercator, SPAR. Around 85% of the client archive is corporate, and it is the strongest argument for a job you have said you do not want. It stays — named, searchable, credible — in Layer 4 and in the corporate lens.</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="num">02 / Structure</div>
+  <div class="body wide">
+    <h2>Four layers</h2>
+    <p class="body" style="margin-bottom:26px;">Each layer answers one visitor completely before offering the next. Nobody is ever asked to scroll through material meant for someone else.</p>
+    <div class="layers">
+      <div class="layer"><div class="layer-n">L1</div><div class="layer-t">Overview</div><div class="layer-d">The hiring manager. Name, position, three works, one line about now. Under a minute, no scrolling required to get the point.</div></div>
+      <div class="layer"><div class="layer-n">L2</div><div class="layer-t">Selected work &amp; career</div><div class="layer-d">The creative director. Seven projects and a career spine. Enough to judge taste and level without commitment.</div></div>
+      <div class="layer"><div class="layer-n">L3</div><div class="layer-t">Case dossiers</div><div class="layer-d">The studio lead. Challenge, approach, precise role, credits, process, outcome, gallery. Depth on demand only.</div></div>
+      <div class="layer"><div class="layer-n">L4</div><div class="layer-t">Archive</div><div class="layer-d">The researcher, and anyone checking you out. Every project and client, filterable. Where scale lives.</div></div>
+    </div>
+    <p class="note">Progressive disclosure is the whole design. Volume is the enemy of seniority — but hidden volume, available on request, is proof of it.</p>
+  </div>
+</section>
+
+<section>
+  <div class="num">03 / Sitemap</div>
+  <div class="body wide">
+    <h2>Seven templates, not seventy pages</h2>
+    <div class="scroll">
+    <table>
+      <thead><tr><th>Route</th><th>Template</th><th>Layer</th><th>Purpose</th></tr></thead>
+      <tbody>
+        <tr><td class="tt"><code>/</code></td><td>Index</td><td class="yr">L1</td><td>Position, three featured plates, now-line</td></tr>
+        <tr><td class="tt"><code>/work</code></td><td>Work index</td><td class="yr">L2</td><td>Seven selected, as an expandable list</td></tr>
+        <tr><td class="tt"><code>/work/[slug]</code></td><td>Case dossier</td><td class="yr">L3</td><td>One per featured project</td></tr>
+        <tr><td class="tt"><code>/profile</code></td><td>Profile</td><td class="yr">L2</td><td>Person, career spine, taste, method</td></tr>
+        <tr><td class="tt"><code>/archive</code></td><td>Archive</td><td class="yr">L4</td><td>Everything, filterable, incl. corporate</td></tr>
+        <tr><td class="tt"><code>/contact</code></td><td>Contact</td><td class="yr">L1</td><td>One line. Email, LinkedIn, CV</td></tr>
+        <tr><td class="tt"><code>/for/[lens]</code></td><td>Lens</td><td class="yr">—</td><td>Unlisted, per application</td></tr>
+      </tbody>
+    </table>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="num">04 / Wireframes</div>
+  <div class="body wide">
+    <h2>Page by page</h2>
+    <div class="frames">
+
+      <div class="frame">
+        <div class="frame-head"><span class="frame-url">/</span><span class="frame-name">Index</span></div>
+        <div class="screen">
+          <div class="blk"><b>Fixed header</b>Godnic — Art Director &amp; Executive Producer · Work / Profile / Archive</div>
+          <div class="blk key tall"><b>Statement</b>Name at display scale. One sentence of position. No image, no hero photograph, no scroll cue.</div>
+          <div class="row3">
+            <div class="blk tall ghost"><b>Plate 01</b>Nacionalni dan stripa</div>
+            <div class="blk tall ghost"><b>Plate 02</b>Muzej norosti</div>
+            <div class="blk tall ghost"><b>Plate 03</b>MGLC</div>
+          </div>
+          <div class="blk"><b>Now</b>One line: what he is doing and what he is looking for</div>
+          <div class="blk"><b>Footer</b>Email · LinkedIn · CV (PDF)</div>
+        </div>
+        <p class="note">The riskiest decision here: no hero image. Three plates carry the images and the type carries the position. An image-led hero would need one photograph strong enough to stand alone — you don't have it, and faking it would be visible.</p>
+      </div>
+
+      <div class="frame">
+        <div class="frame-head"><span class="frame-url">/work</span><span class="frame-name">Work index</span></div>
+        <div class="screen">
+          <div class="blk"><b>Header</b></div>
+          <div class="blk"><b>Filter rail</b>All · Culture &amp; museums · Identity · Film &amp; motion · Independent</div>
+          <div class="blk key"><b>Row — expandable</b>2025 · Nacionalni dan stripa · Ministrstvo za kulturo · Exec producer, art direction →</div>
+          <div class="blk"><b>Row</b>2024 · Muzej norosti · Identity system</div>
+          <div class="blk"><b>Row</b>2023 · 35. graficni bienale · MGLC</div>
+          <div class="blk"><b>Row</b>2024 · schwarzbartl · Brand architecture</div>
+          <div class="blk"><b>Row</b>2021 · zbliževalnik · Outsider</div>
+          <div class="blk"><b>Row</b>2024 · alto · Art direction</div>
+          <div class="blk"><b>Row</b>— · flet · Personal</div>
+          <div class="blk ghost"><b>Tail</b>→ Full archive, 130+ clients</div>
+        </div>
+        <p class="note">A list, not a grid of cards. Rows expand in place to a summary; the title opens the dossier. Reads like a production company's job list.</p>
+      </div>
+
+      <div class="frame">
+        <div class="frame-head"><span class="frame-url">/work/[slug]</span><span class="frame-name">Case dossier</span></div>
+        <div class="screen">
+          <div class="blk"><b>Title block</b>Project · Client · Year · Category</div>
+          <div class="blk key"><b>Premise</b>One sentence. The whole argument.</div>
+          <div class="blk"><b>Role &amp; responsibilities</b>Executive Producer &amp; Project Lead — art direction</div>
+          <div class="blk"><b>Credits</b>Design: Aleksandra Vugrin · Strategy: Jernej Verbic · Produced by Dobre zgodbe</div>
+          <div class="blk tall"><b>Plate — full measure</b>The single strongest artefact. For Comics Day: the empty A4 panel.</div>
+          <div class="blk"><b>Context</b>The challenge</div>
+          <div class="blk"><b>Approach</b>Creative and production decisions</div>
+          <div class="row"><div class="blk tall ghost"><b>Gallery</b></div><div class="blk tall ghost"><b>Gallery</b></div></div>
+          <div class="blk ghost"><b>Film</b>Embed — lazy, poster frame, no autoplay</div>
+          <div class="blk"><b>Outcome</b>Facts only, where they exist</div>
+          <div class="blk"><b>Related</b>Two projects</div>
+        </div>
+        <p class="note">Credits sit directly under the role, high on the page — not buried at the bottom. It reads as confidence, and it's the honest placement.</p>
+      </div>
+
+      <div class="frame">
+        <div class="frame-head"><span class="frame-url">/profile</span><span class="frame-name">Profile</span></div>
+        <div class="screen">
+          <div class="blk key tall"><b>Opening</b>Friulano. Karst above Trieste — vineyards, olive trees, sea views. Italian television, books, film. Journalism, then Rome.</div>
+          <div class="blk"><b>Method</b>Idea → art concept → execution → production → post → distribution. Where he is fast, and what he refuses.</div>
+          <div class="blk"><b>Career spine</b>2018–26 Top Stories · 2021–22 Outbrain · 2016–18 EUIPO · 2015 Expo Milano · 2015–16 UL FRI · ICE / Italian Embassy · RTV Slovenia · Siol.net</div>
+          <div class="blk"><b>Leading</b>Team of up to 10. Directed camera crews, editors, motion and graphic designers, plus freelance crews.</div>
+          <div class="blk"><b>Looking</b>Kinodvor most weeks. European festival cinema. NTS. Vinyl — new pressings only. Architecture and design books. Japan, Peru, alone.</div>
+          <div class="blk ghost"><b>Portrait</b>One. Needed.</div>
+        </div>
+        <p class="note">Taste is not decoration on this page — for a design studio it is the hiring criterion. It gets equal weight to the career spine.</p>
+      </div>
+
+      <div class="frame">
+        <div class="frame-head"><span class="frame-url">/archive</span><span class="frame-name">Archive</span></div>
+        <div class="screen">
+          <div class="blk"><b>Search</b>Free text across client, sector, discipline, year</div>
+          <div class="blk"><b>Facets</b>Sector · Discipline · Role · Strand · Year</div>
+          <div class="blk"><b>Strand toggle</b>Studio / Employment / Independent / Personal — never blurred</div>
+          <div class="blk tall"><b>Results — dense table</b>Year · Client · Project · Role · Sector. Text only. No thumbnails.</div>
+          <div class="blk"><b>Row detail</b>Expands to two lines. Links to a dossier only where one exists.</div>
+        </div>
+        <p class="note">Deliberately unglamorous. This is where Novartis, SAP, IBM and Triglav live, and where scale becomes checkable without becoming the message.</p>
+      </div>
+
+      <div class="frame">
+        <div class="frame-head"><span class="frame-url">/for/[lens]</span><span class="frame-name">Lens</span></div>
+        <div class="screen">
+          <div class="blk key"><b>Custom opening</b>Written for one employer. Two sentences, by hand.</div>
+          <div class="blk"><b>Reordered selection</b>Four to six projects, chosen and ordered for this application</div>
+          <div class="blk"><b>Profile — trimmed</b>Only the relevant strands</div>
+          <div class="blk"><b>Contact</b></div>
+          <div class="blk ghost"><b>Hidden</b>No filter chips. No “showing 6 of 41”. No trace of a database.</div>
+        </div>
+        <p class="note">The rule that makes this work: a lens must read as a deliberate edit, never as a query. If it looks generated it destroys the seniority it exists to build. Every lens gets a hand-written opening line — that is the cost of admission.</p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="num">05 / Selection</div>
+  <div class="body wide">
+    <h2>The seven, and why</h2>
+    <div class="scroll">
+    <table>
+      <thead><tr><th>Year</th><th>Project</th><th>Client</th><th>Your role</th><th>Evidence</th></tr></thead>
+      <tbody>
+        <tr><td class="yr">2025</td><td class="tt">Nacionalni dan stripa</td><td>Ministrstvo za kulturo</td><td>Exec producer, art direction</td><td><span class="tag on">Strong</span></td></tr>
+        <tr><td class="yr">2024</td><td class="tt">Zavod Muzej norosti</td><td>Museum of Madness, Trate</td><td>Art direction, identity system</td><td><span class="tag on">Strong</span></td></tr>
+        <tr><td class="yr">2023</td><td class="tt">35. graficni bienale</td><td>MGLC</td><td>Exec producer, format design</td><td><span class="tag on">Strong</span></td></tr>
+        <tr><td class="yr">2024</td><td class="tt">schwarzbartl</td><td>Independent</td><td>Brand architecture, naming</td><td><span class="tag">Lockups need re-setting</span></td></tr>
+        <tr><td class="yr">2021</td><td class="tt">zbliževalnik</td><td>Outsider</td><td>Production, film</td><td><span class="tag">Thin — needs assets</span></td></tr>
+        <tr><td class="yr">2024</td><td class="tt">alto</td><td>Independent</td><td>Art direction</td><td><span class="tag">Thin — needs assets</span></td></tr>
+        <tr><td class="yr">—</td><td class="tt">flet</td><td>Personal</td><td>Design, self-directed</td><td><span class="tag">Photos not yet accessible</span></td></tr>
+      </tbody>
+    </table>
+    </div>
+    <h3>Cut, and why</h3>
+    <ul>
+      <li><strong>mrfy — tonemo.</strong> Production assistant. A junior credit lowers the whole read.</li>
+      <li><strong>123zero.</strong> Cut at your instruction.</li>
+      <li><strong>ZAPS.</strong> Standards PDFs and a strategy document. Nothing to show.</li>
+      <li><strong>Triglav.</strong> The best documented result you own — three years, 18 episodes, +11% constructive behaviours, 78.8% viewership, Silver at SOF. Archive and corporate lens only. Featuring it argues for the job you're leaving.</li>
+      <li><strong>MAO, Center za kreativnost, Filharmonija, Motovila, Expo 2025.</strong> Out, per you.</li>
+    </ul>
+  </div>
+</section>
+
+<section>
+  <div class="num">06 / Direction</div>
+  <div class="body">
+    <h2>Visual direction — Index &amp; Dossier</h2>
+    <p>Editorial and disciplined. A grotesque carries structure; a serif appears only for premises and quoted lines; a monospace handles labels, credits and data. Generous margins, hairline rules, a numbered index logic borrowed from a production company's job list.</p>
+    <p><strong>Images sit in framed plates at deliberate scale, never stretched full-bleed.</strong> This is a decision made from a constraint: much of what you hold exports at 250–640 px. Presenting images at considered size, inside a frame, reads as art direction. Blowing them up reads as a broken portfolio.</p>
+    <p>Motion is restrained — opacity and an 8–12 px rise, 300–400 ms, and nothing that moves unless a person asked it to. <code>prefers-reduced-motion</code> honoured throughout.</p>
+    <div class="flag">
+      <p><strong>Full reset from the 2025 portfolio.</strong> The electric blue gradient, the yellow accent and the lowercase manifesto are the opposite of this. Nothing carries over except the facts.</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="num">07 / Blocking</div>
+  <div class="body">
+    <h2>What I still need before building</h2>
+    <ul>
+      <li><strong>A portrait.</strong> One. There is currently no photograph of you anywhere.</li>
+      <li><strong>flet photographs.</strong> Google Photos links don't open for me — put them in Drive.</li>
+      <li><strong>e-kultura.</strong> The shared folder shows nothing without sign-in.</li>
+      <li><strong>Comics Day at full resolution</strong> — posters, installations at Tinta and the City Museum, DOOH, the live animation.</li>
+      <li><strong>Muzej norosti as produced</strong> — photographs of the identity in use, not only the concept deck.</li>
+      <li><strong>alto and zbliževalnik masters</strong>, or both drop out of the seven.</li>
+      <li><strong>The corrected Comics Day slogan file.</strong> The press asset reads <em>IMAM KATAKTER</em>. It cannot appear.</li>
+      <li><strong>CV corrections</strong> — remove the music-video claim; fix “Ceative-Ops”; add the SOF Silver.</li>
+    </ul>
+  </div>
+</section>
+
+<footer>
+  <span>Layers &amp; Lenses — Draft 01</span>
+  <span>Approve, amend, or reject before build</span>
+</footer>
+
+</div>

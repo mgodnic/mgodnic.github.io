@@ -1,0 +1,659 @@
+/* Mitja Godnic — "Mitja Godnic — Personal Brand" design system, resolved direction:
+   dense editorial (claude.ai/design · d8cd06af, 22 Aug 2026).
+
+   What this system has none of: rules or hairlines · borders or radii · filled tiles
+   or mortar · tags, chips, badges · buttons (actions are text) · numbered sections ·
+   accent colour or panels · shadows · uppercase micro-labels · drawn marks.
+
+   Structure comes from space, scale and value. */
+
+/* The fonts are linked from each page's <head>, next to their preconnects. An
+   @import here would duplicate that request and serialise it behind this file. */
+
+:root{
+  /* ——— paper, ink, and the greys between. Colour enters only through photography. ——— */
+  --white:#ffffff;
+  --paper:#e8e6e5;
+  --paper-light:#f1f0ef;
+  --mist:#d7d5d3;
+  --stone:#b9beb8;
+  --sage:#88958d;
+  --sage-deep:#5f6c64;
+  --ink:#363c38;
+  --ink-deep:#242823;
+  --black:#000000;
+
+  --text-primary:var(--black);
+  --text-secondary:var(--ink);
+  --text-tertiary:var(--sage);
+  --text-quiet:var(--sage-deep);
+  --text-disabled:var(--stone);
+  --text-inverse:var(--paper);
+
+  --surface-page:var(--paper);
+  --surface-plate:var(--mist);
+  --surface-control:rgba(255,255,255,.55);
+  --surface-control-hover:var(--white);
+
+  --focus-ring:var(--black);
+  --selection-bg:var(--ink);
+  --selection-fg:var(--paper);
+
+  /* ——— type: serif for the name and all titles, sans for everything else ——— */
+  --font-serif:"Shippori Mincho","Hiragino Mincho ProN","Times New Roman",serif;
+  --font-sans:"Public Sans","Helvetica Neue",Helvetica,sans-serif;
+  --font-display:var(--font-serif);
+  --font-body:var(--font-sans);
+  --weight-light:300; --weight-regular:400; --weight-medium:500; --weight-semibold:600;
+  --fs-11:11px; --fs-12:12px; --fs-13:13px; --fs-14:14px; --fs-16:16px; --fs-18:18px;
+  --fs-21:21px; --fs-26:26px; --fs-32:32px; --fs-38:38px; --fs-46:46px; --fs-56:56px; --fs-72:72px;
+  --fs-lede:clamp(38px,5.4vw,72px);
+  --fs-title:clamp(26px,3vw,38px);
+  --lh-display:1.1; --lh-title:1.12; --lh-heading:1.2; --lh-body:1.62; --lh-dense:1.5;
+  --track-display:-.024em; --track-title:-.016em; --track-heading:-.012em;
+  --track-body:0em; --track-serif:-.005em;
+
+  /* ——— space: 4px base, worked rather than empty ——— */
+  --space-1:4px; --space-2:8px; --space-3:12px; --space-4:16px; --space-5:22px;
+  --space-6:32px; --space-7:44px; --space-8:64px; --space-9:88px; --space-10:120px; --space-11:160px;
+  --gap-column:clamp(32px,5vw,120px);
+  --gap-row:var(--space-5);
+  --gap-section:clamp(84px,13vh,148px);
+  /* The sticky header's height. Used for its own min-height, and to keep any
+     anchor target from landing underneath it. */
+  --header-height:72px;
+
+  /* ——— layout: one measured column set, hung off the left margin ——— */
+  --grid-gutter:32px;
+  --page-margin:clamp(24px,5vw,88px);
+  --page-max:none;
+  --measure-prose:68ch;
+  /* The same measure in a font-size-independent unit, and the main column's
+     share of the intro grid. Both exist so the display heading can be set to
+     the exact width of the body paragraph below it. Keep them in step with
+     --measure-prose and --split-main / --split-aside above. */
+  --measure-prose-fixed:41.604rem;
+  --split-main-ratio:.6;
+  --measure-narrow:38ch;
+  --split-main:1.5fr;
+  --split-aside:1fr;
+
+  color-scheme:light;
+
+  --dur-fast:140ms; --dur-base:240ms; --dur-slow:420ms;
+  --ease-precise:cubic-bezier(.2,.6,.1,1);
+  --ease-out:cubic-bezier(.16,1,.3,1);
+}
+
+/* This site does not follow the operating system's colour scheme. It is a
+   printed page: one palette, the same on every device, in every light. The
+   inverted scope below is a design device — put data-theme="dark" on a
+   container to flip that container — and is never triggered by the OS. */
+[data-theme="dark"]{
+  --text-primary:var(--paper);
+  --text-secondary:rgba(232,230,229,.76);
+  --text-tertiary:rgba(232,230,229,.5);
+  --text-quiet:rgba(232,230,229,.62);
+  --surface-page:var(--ink);
+  --surface-plate:#2f342f;
+  --focus-ring:var(--paper);
+  --selection-bg:var(--paper);
+  --selection-fg:var(--ink);
+}
+@media (prefers-reduced-motion:reduce){
+  :root{--dur-fast:0ms;--dur-base:0ms;--dur-slow:0ms;}
+  html{scroll-behavior:auto;}
+  *,*::before,*::after{animation-duration:.001ms!important;transition-duration:.001ms!important;}
+}
+
+*{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  margin:0;background:var(--surface-page);color:var(--text-primary);
+  font-family:var(--font-body);font-size:var(--fs-16);font-weight:var(--weight-regular);
+  line-height:var(--lh-body);letter-spacing:var(--track-body);-webkit-font-smoothing:antialiased;
+}
+::selection{background:var(--selection-bg);color:var(--selection-fg);}
+img{max-width:100%;display:block;height:auto;}
+a{color:inherit;text-decoration:none;}
+:focus-visible{outline:1.5px solid var(--focus-ring);outline-offset:3px;}
+.skip{position:absolute;left:-9999px;}
+.skip:focus{left:var(--page-margin);top:12px;z-index:900;background:var(--white);padding:8px 14px;}
+
+.shell{max-width:var(--page-max);margin:0 auto;padding:0 var(--page-margin);}
+.photo-grid{max-width:none;}
+
+/* ---------- header — sticky, frosted ----------
+   Paper at two-thirds opacity over a heavy blur, with a little saturation so the
+   colour passing underneath stays alive rather than going grey. Still no rule and
+   no shadow: the softness is the edge. Browsers without backdrop-filter get the
+   solid ground instead, which is why the fallback is declared first. */
+.nav{
+  position:sticky;top:0;z-index:200;
+  display:flex;justify-content:space-between;align-items:baseline;gap:var(--space-6);
+  flex-wrap:wrap;
+  min-height:var(--header-height);
+  padding-block:var(--space-5);
+  background:var(--surface-page);
+}
+@supports ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){
+  .nav{
+    background:color-mix(in srgb, var(--surface-page) 66%, transparent);
+    -webkit-backdrop-filter:blur(22px) saturate(1.8);
+    backdrop-filter:blur(22px) saturate(1.8);
+  }
+}
+.nav .id{
+  font-family:var(--font-serif);font-weight:var(--weight-medium);
+  font-size:var(--fs-21);letter-spacing:var(--track-serif);line-height:1.1;white-space:nowrap;
+}
+.nav .id span{display:none;}
+.nav ul{margin:0;padding:0;list-style:none;display:flex;gap:var(--space-6);}
+.nav a{font-size:var(--fs-13);color:var(--text-quiet);line-height:1.55;}
+.nav a[aria-current="page"]{color:var(--text-primary);}
+
+/* On a phone the bar stays pinned too, but it has to earn its keep: one line,
+   tighter type, less height. A wrapped two-line header would take a fifth of
+   the viewport and never give it back. */
+@media(max-width:620px){
+  /* The compact header is shorter, so anchor targets need less clearance. */
+  :root{--header-height:50px;}
+  .nav{
+    flex-wrap:nowrap;
+    min-height:0;
+    gap:var(--space-3);
+    padding-block:var(--space-3);
+  }
+  .nav .id{font-size:var(--fs-16);}
+  .nav ul{gap:var(--space-3);flex:0 1 auto;}
+  .nav a{font-size:var(--fs-12);}
+}
+@media(max-width:480px){
+  .nav{gap:var(--space-2);}
+  .nav .id{font-size:var(--fs-14);}
+  .nav ul{gap:var(--space-3);}
+  .nav a{font-size:var(--fs-11);}
+}
+@media(max-width:380px){
+  /* last resort before anything would clip: the mark drops to initials */
+  .nav .id{font-size:var(--fs-13);}
+  .nav ul{gap:var(--space-2);}
+}
+
+/* ---------- type ---------- */
+.eyebrow{font-size:var(--fs-13);color:var(--text-tertiary);margin:0 0 var(--space-4);
+  text-transform:none;letter-spacing:var(--track-body);}
+/* The hero line. Only ever an h1 — a paragraph that merely wants to be
+   a little larger uses .lede on a <p>, which is a different thing. */
+h1.display,h1.lede{
+  font-family:var(--font-serif);font-weight:var(--weight-regular);
+  font-size:var(--fs-lede);line-height:var(--lh-display);letter-spacing:var(--track-display);
+  max-width:20ch;margin:0;text-wrap:balance;
+}
+p.lede{font-size:var(--fs-18);line-height:var(--lh-dense);color:var(--text-secondary);
+  max-width:var(--measure-prose);}
+h2{
+  font-family:var(--font-serif);font-weight:var(--weight-regular);font-size:var(--fs-26);
+  letter-spacing:var(--track-heading);line-height:var(--lh-heading);
+  color:var(--text-secondary);margin:0 0 var(--space-6);
+}
+h3{font-size:var(--fs-16);font-weight:var(--weight-medium);margin:0 0 var(--space-2);}
+p{margin:0 0 var(--space-4);max-width:var(--measure-prose);font-size:var(--fs-16);line-height:var(--lh-body);}
+.statement,.intro p{color:var(--text-secondary);}
+.premise{
+  font-family:var(--font-serif);font-weight:var(--weight-regular);
+  font-size:var(--fs-title);line-height:var(--lh-title);letter-spacing:var(--track-title);
+  max-width:26ch;margin:0;color:var(--text-primary);text-wrap:balance;
+}
+.serif-note{font-family:var(--font-serif);font-style:italic;color:var(--text-tertiary);}
+.small{font-size:var(--fs-13);color:var(--text-quiet);line-height:1.55;}
+
+/* ---------- home ---------- */
+.hero{padding-block:clamp(56px,9vh,112px) 0;}
+.hero .role,.hero .thesis{display:none;}
+.intro{display:grid;grid-template-columns:var(--split-main) var(--split-aside);
+  gap:var(--gap-column);margin-top:var(--space-7);align-items:start;}
+@media(max-width:860px){.intro{grid-template-columns:1fr;gap:var(--space-6);}}
+.intro p{margin:0;max-width:var(--measure-prose);}
+.intro p+p{margin-top:var(--space-4);}
+.aside{font-size:var(--fs-14);line-height:1.6;color:var(--text-quiet);}
+.aside span{display:block;}
+.aside .gap{margin-top:var(--space-3);}
+
+/* ---------- sections ---------- */
+.band{padding-block:0;margin-top:var(--gap-section);border:0;}
+/* Sections read heading-then-content. The 1.5fr/1fr split is reserved for
+   the intro and its aside — it is not a label rail. */
+.cols{display:block;}
+.cols > .eyebrow{
+  font-family:var(--font-serif);font-weight:var(--weight-regular);font-size:var(--fs-26);
+  letter-spacing:var(--track-heading);line-height:var(--lh-heading);
+  color:var(--text-secondary);margin:0 0 var(--space-6);text-transform:none;
+}
+
+/* ---------- work index — the list is the layout ---------- */
+.worklist{list-style:none;margin:0;padding:0;display:block;}
+.wentry{
+  display:grid;grid-template-columns:minmax(340px,1.25fr) minmax(0,1.5fr) minmax(72px,auto);
+  gap:var(--gap-column);align-items:baseline;padding:var(--gap-row) 0;
+}
+@media(max-width:760px){
+  .wentry{grid-template-columns:1fr;gap:var(--space-2);}
+  .wentry .wy{text-align:left;}
+}
+.wentry .wt{
+  font-family:var(--font-serif);font-weight:var(--weight-regular);font-size:var(--fs-title);
+  letter-spacing:var(--track-title);line-height:var(--lh-title);color:var(--text-primary);
+}
+.wentry .wd{font-size:var(--fs-16);line-height:1.55;color:var(--text-quiet);max-width:62ch;}
+.wentry .wy{font-size:var(--fs-13);color:var(--text-tertiary);text-align:right;white-space:nowrap;}
+
+/* ---------- filters — text, not chips ---------- */
+.filters{display:flex;flex-wrap:wrap;gap:var(--space-2) var(--space-6);padding:0 0 var(--space-6);}
+.filters button{
+  font-family:var(--font-body);font-size:var(--fs-13);background:none;border:0;padding:0;
+  cursor:pointer;color:var(--text-tertiary);text-transform:none;letter-spacing:var(--track-body);
+  transition:color var(--dur-fast) var(--ease-precise);
+}
+.filters button:hover{color:var(--text-primary);}
+.filters button[aria-pressed="true"]{color:var(--text-primary);}
+
+/* ---------- plates & figures — the one compositional device ---------- */
+/* Two uneven pairs — wide/narrow, then narrow/wide. Four works without ever
+   becoming the even grid of equal thumbnails the system rules out. */
+.figures{display:grid;grid-template-columns:repeat(12,1fr);gap:clamp(24px,3vw,52px) clamp(20px,3vw,44px);margin-top:var(--space-3);}
+.figures > *:nth-child(1){grid-column:span 7;}
+.figures > *:nth-child(2){grid-column:span 5;}
+.figures > *:nth-child(3){grid-column:span 5;}
+.figures > *:nth-child(4){grid-column:span 7;}
+@media(max-width:760px){.figures{grid-template-columns:1fr;}.figures > *{grid-column:auto !important;}}
+/* On the home page the plates are cropped, not fitted — full-bleed imagery,
+   whatever a project does on its own page. */
+.figures .plate{padding:0;}
+.figures .plate img,.figures .plate.contain img,.figures .plate.field img{object-fit:cover;}
+figure{margin:0;}
+.plate,.plateFull{background:var(--surface-plate);overflow:hidden;border:0;}
+.plate img,.plateFull img{width:100%;height:100%;object-fit:cover;}
+/* A flat-field image (a client mark on colour) is contained, and the plate takes
+   the field's own colour so the edge is invisible and the mark never crops. */
+.plate.contain img{object-fit:contain;}
+.plateFull{margin:0 0 var(--space-3);}
+.plateFull.contain{background:var(--white);}
+/* A client mark on a flat colour field. The plate sets the field; the mark is
+   contained inside it and never upscaled past the frame. Because the plate's
+   background matches the artwork's own field, the edge is invisible. */
+.plateFull.field{aspect-ratio:16/9;display:flex;align-items:center;justify-content:center;}
+/* a series of films, stacked and captioned */
+.filmseries{display:grid;gap:var(--space-7);margin:0 0 var(--space-8);}
+.filmfig{margin:0;}
+.filmfig .embed{margin:0;}
+.plateFull.field img{width:100%;height:100%;object-fit:contain;}
+.plate.field img{object-fit:contain;}
+.plateFull.contain img{object-fit:contain;height:auto;}
+.cap{margin-top:var(--space-3);font-size:var(--fs-13);color:var(--text-secondary);}
+.cred{margin-top:2px;font-family:var(--font-serif);font-style:italic;font-size:var(--fs-12);
+  color:var(--text-tertiary);max-width:52ch;}
+
+/* ---------- film ---------- */
+.embed{display:block;position:relative;padding-top:56.25%;background:var(--surface-plate);margin:0 0 var(--space-3);}
+.embed iframe{position:absolute;inset:0;width:100%;height:100%;border:0;}
+.facade{cursor:pointer;}
+.facade img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
+.playbtn{
+  position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+  display:inline-block;white-space:nowrap;
+  width:auto;height:auto;border:0;border-radius:0;background:none;padding:0 0 .14em;
+  font-family:var(--font-body);font-size:var(--fs-16);color:var(--white);cursor:pointer;
+  text-shadow:0 1px 24px rgba(0,0,0,.6);
+  background-image:linear-gradient(var(--white),var(--white));
+  background-repeat:no-repeat;background-position:0 100%;background-size:0% 1px;
+  transition:background-size var(--dur-base) var(--ease-precise);
+}
+.facade:hover .playbtn{background-size:100% 1px;}
+
+
+/* ---------- dossier ---------- */
+.dossier{padding-top:clamp(48px,8vh,96px);}
+.dhead{display:grid;grid-template-columns:var(--split-main) var(--split-aside);
+  gap:var(--gap-column);align-items:start;margin-bottom:var(--space-8);}
+@media(max-width:900px){.dhead{grid-template-columns:1fr;gap:var(--space-6);}}
+.dmeta dl,.credits dl{margin:0;display:grid;grid-template-columns:130px minmax(0,1fr);
+  gap:var(--space-3) var(--space-6);font-size:var(--fs-14);align-items:baseline;}
+.dmeta dt,.credits dt{font-size:var(--fs-13);color:var(--text-tertiary);
+  text-transform:none;letter-spacing:var(--track-body);padding:0;background:none;}
+.dmeta dd,.credits dd{margin:0;padding:0;background:none;color:var(--text-secondary);line-height:1.5;}
+.credits{margin-top:var(--space-6);}
+
+.gallery{display:grid;grid-template-columns:1.4fr 1fr;gap:clamp(20px,3vw,44px);
+  align-items:start;margin:0 0 var(--space-6);}
+/* A single image has no pair to be uneven against: let it run the full width
+   rather than sit in the wide column with an empty one beside it. */
+.gallery > figure:only-child{grid-column:1 / -1;}
+@media(max-width:760px){.gallery{grid-template-columns:1fr;}}
+.gallery figure{margin:0;}
+.gallery img{width:100%;}
+.gallery figure .empty{aspect-ratio:3/2;background:var(--surface-plate);}
+
+ul.plain{margin:0 0 var(--space-4);padding-left:18px;max-width:var(--measure-prose);}
+ul.plain li{margin-bottom:var(--space-2);}
+.facts{list-style:none;margin:0;padding:0;max-width:none;background:none;
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:0 var(--gap-column);}
+.facts li{background:none;padding:var(--space-3) 0;font-size:var(--fs-16);
+  line-height:var(--lh-dense);color:var(--text-secondary);}
+
+/* ---------- the record ----------
+   The last section of Work, not a page of its own. Separated from the
+   selection above it by a field of space, and set quieter, so it reads as
+   evidence of scale rather than as a second body of work. */
+/* ---------- the living thesis ----------
+   Two words in the opening line change on a slow beat. The change is carried
+   by value alone — a cross-fade, nothing that moves or draws — so the heading
+   still reads as set type rather than as a widget. */
+/* The live line is set to exactly the width of the intro paragraph beneath it,
+   so the two share a right edge. That paragraph is whichever is narrower: the
+   main column of the intro grid, or the prose measure. Both are restated here
+   in units that do not follow font size, because the display line is four
+   times the body size and 68ch of it would be a different width entirely. */
+h1.thesis-live{
+  max-width:min(
+    calc((100% - var(--gap-column)) * var(--split-main-ratio)),
+    var(--measure-prose-fixed)
+  );
+  text-wrap:pretty;
+  /* the depth moves with the words, under the same cross-fade */
+  transition:min-height 420ms cubic-bezier(.4,0,.2,1);
+}
+@media(max-width:860px){
+  /* the intro collapses to one column here, and the paragraph fills it */
+  h1.thesis-live{max-width:min(100%, var(--measure-prose-fixed));}
+}
+.thesis-live .swap{
+  display:inline-block;
+  opacity:1;
+  transition:opacity 340ms cubic-bezier(.4,0,.2,1);
+}
+.thesis-live .swap.out{opacity:0;}
+@media(prefers-reduced-motion:reduce){
+  h1.thesis-live,.thesis-live .swap{transition:none;}
+}
+
+.record{margin-top:clamp(110px,18vh,220px);}
+/* The header is sticky, so anything arriving by anchor must clear it. */
+[id]{scroll-margin-top:calc(var(--header-height) + var(--space-5));}
+.record .lede{max-width:52ch;}
+.record .serif-note{display:block;margin-top:var(--space-3);max-width:58ch;}
+#agroups{display:block;background:none;margin-top:var(--space-4);}
+.agroup{display:grid;grid-template-columns:minmax(200px,1fr) 4fr;
+  gap:var(--space-6);background:none;padding:var(--gap-row) 0;align-items:baseline;}
+@media(max-width:800px){.agroup{grid-template-columns:1fr;gap:var(--space-2);}}
+.agroup h3{background:none;padding:0;margin:0;font-family:var(--font-serif);
+  font-weight:var(--weight-regular);font-size:var(--fs-18);letter-spacing:var(--track-heading);
+  color:var(--text-primary);text-transform:none;}
+.alist{background:none;padding:0;display:block;font-size:var(--fs-16);
+  line-height:1.7;color:var(--text-quiet);}
+.alist span:not(:last-child)::after{content:" · ";color:var(--text-tertiary);}
+
+/* ---------- profile ---------- */
+.portrait{background:var(--surface-plate);border:0;}
+.tl{margin:0;padding:0;display:block;background:none;list-style:none;}
+.tl li{list-style:none;display:grid;grid-template-columns:130px minmax(0,1fr);
+  gap:var(--space-6);padding:15px 0;align-items:baseline;background:none;border:0;}
+@media(max-width:640px){.tl li{grid-template-columns:1fr;gap:var(--space-1);}}
+.tl .yr{background:none;padding:0;font-size:var(--fs-13);color:var(--text-tertiary);
+  font-variant-numeric:tabular-nums;}
+.tl li > div{background:none;padding:0;}
+.tl .org{font-family:var(--font-serif);font-weight:var(--weight-medium);font-size:var(--fs-18);
+  letter-spacing:var(--track-serif);color:var(--text-primary);}
+.tl .rl{font-size:var(--fs-14);color:var(--text-quiet);}
+.tl .nt{font-size:var(--fs-14);margin-top:var(--space-2);max-width:none;color:var(--text-quiet);}
+.clientline{display:block;max-width:none;font-size:var(--fs-16);line-height:1.7;color:var(--text-quiet);}
+.clientline span:not(:last-child)::after{content:" · ";color:var(--text-tertiary);}
+.todo{font-size:var(--fs-12);font-style:italic;font-family:var(--font-serif);
+  color:var(--text-tertiary);background:none;padding:0;margin-left:var(--space-2);text-transform:none;}
+body[data-todo="off"] .todo,body[data-todo="off"] .todo-row{display:none;}
+
+/* ---------- photographs — 4:5, the set's own ratio, so nothing is cropped
+   to fit a square that isn't theirs ---------- */
+.photo-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--space-2);}
+@media(max-width:640px){.photo-grid{grid-template-columns:repeat(2,1fr);}}
+.photo{display:block;aspect-ratio:4/5;overflow:hidden;background:var(--surface-plate);}
+.photo img{width:100%;height:100%;object-fit:cover;
+  transition:opacity var(--dur-base) var(--ease-precise);}
+.photo:hover img{opacity:.8;}
+.photo-grid:empty{display:none;}
+
+/* ---------- hover: an underline wiping open from the left ----------
+   A gradient background rather than text-decoration, because background-size
+   animates and text-decoration-color only fades. box-decoration-break:clone
+   means a title that wraps gets a line under each line of it, each wiping
+   from its own left edge. The targets are inline so the wipe measures the
+   words, not the column. */
+.u,
+.nav a,
+.filters button,
+.go,
+.fcol a,
+.radio-btn,
+.facade .playbtn{
+  display:inline;
+  background-image:linear-gradient(var(--sage-deep),var(--sage-deep));
+  background-repeat:no-repeat;
+  background-position:0 100%;
+  background-size:0% 1px;
+  padding-bottom:.14em;
+  -webkit-box-decoration-break:clone;
+  box-decoration-break:clone;
+  transition:background-size var(--dur-base) var(--ease-precise),
+             color var(--dur-fast) var(--ease-precise);
+}
+.wentry:hover .u,
+.nav a:hover,
+.filters button:hover,
+.go:hover,
+.fcol a:hover,
+.radio-btn:hover,
+.radio-btn:focus-visible,
+.facade:hover .playbtn{
+  background-size:100% 1px;
+}
+.nav a[aria-current="page"]{background-size:100% 1px;}
+/* the serif titles carry the line a touch lower */
+.wentry .u{padding-bottom:.1em;}
+/* buttons and inline-blocks need to size to their text for the wipe to measure it */
+.filters button{display:inline;padding-top:0;}
+.go{display:inline;margin-top:0;}
+.go-wrap{display:block;margin-top:var(--space-4);}
+.fcol{align-items:flex-start;}
+
+/* ---------- video production ----------
+   One film to a row, at full column width, because the film is the work. The
+   text beneath uses the same uneven pair as the record: what it is on the
+   narrow side, what it does on the wide one. */
+.vintro{margin-top:var(--space-5);max-width:var(--measure-prose);}
+.vlist{display:block;}
+.vfilm{display:block;margin-bottom:clamp(72px,10vh,132px);}
+.vfilm:last-child{margin-bottom:0;}
+.vfilm .embed{margin:0;}
+.vmeta{
+  display:grid;grid-template-columns:minmax(240px,1fr) 1.6fr;
+  gap:var(--space-4) var(--gap-column);align-items:baseline;
+  margin-top:var(--space-4);
+}
+@media(max-width:800px){.vmeta{grid-template-columns:1fr;gap:var(--space-2);}}
+.vtitle{
+  font-family:var(--font-serif);font-weight:var(--weight-regular);
+  font-size:var(--fs-21);letter-spacing:var(--track-heading);line-height:var(--lh-heading);
+  color:var(--text-primary);margin:0;
+}
+.vorig{
+  font-family:var(--font-serif);font-style:italic;font-size:var(--fs-15);
+  color:var(--text-tertiary);margin:var(--space-1) 0 0;max-width:none;
+}
+.vclient{font-size:var(--fs-13);color:var(--text-quiet);margin:var(--space-2) 0 0;max-width:none;}
+.vdesc{margin:0;font-size:var(--fs-16);line-height:var(--lh-body);color:var(--text-secondary);
+  max-width:var(--measure-prose);}
+
+/* ---------- radio ----------
+   It sits in the empty column to the right of the headline, which the headline
+   never reaches. Nothing is drawn to make it carry: it is held by the space
+   around it, and by setting the station at title scale in the serif — the only
+   place on the page besides the headline where that face is used large. */
+.hero{position:relative;}
+/* The one filled panel on the site. It is here because this is the one thing
+   on the page you operate rather than read, and radio is dark by convention —
+   ink-deep from the palette, not a new colour, and square like the plates. */
+.radio{
+  position:absolute;top:var(--space-5);right:0;
+  display:flex;flex-direction:column;align-items:flex-start;gap:var(--space-2);
+  margin:0;width:min(320px,38vw);max-width:none;text-align:left;
+  background:var(--ink-deep);color:var(--text-inverse);
+  padding:clamp(18px,1.8vw,26px);
+}
+.radio-q{
+  font-size:var(--fs-15);line-height:var(--lh-dense);color:var(--sage);
+}
+.radio-btn{
+  margin-top:var(--space-2);
+  font-family:var(--font-serif);font-weight:var(--weight-regular);
+  font-size:var(--fs-26);line-height:var(--lh-heading);letter-spacing:var(--track-heading);
+  color:var(--text-inverse);background-color:transparent;border:0;padding:0 0 .1em;
+  cursor:pointer;text-align:left;white-space:nowrap;
+}
+/* the wipe is sage-deep everywhere else; on this ground it would disappear */
+.radio-btn{background-image:linear-gradient(var(--paper),var(--paper));}
+/* Below this the headline runs the whole column and there is no space to sit
+   in, so the line returns to the flow under the intro. */
+@media(max-width:900px){
+  .hero{position:static;}
+  .radio{
+    position:static;margin-top:var(--space-7);
+    width:100%;max-width:var(--measure-prose);
+  }
+}
+/* connecting and failed states read as status, not as something to press */
+.radio-btn[data-state="connecting"],
+.radio-btn[data-state="error"]{color:var(--sage);}
+.radio-btn[data-state="error"]{cursor:default;}
+.radio-btn[data-state="playing"]{background-size:100% 1px;}
+/* what is on air right now, read from NTS — the line that makes the block
+   different every hour instead of a control sitting in a corner */
+.radio-now{
+  font-size:var(--fs-13);line-height:var(--lh-dense);color:var(--sage);
+  max-width:none;
+}
+.radio-show,.radio-loc{display:block;}
+/* sage-deep fails against ink-deep, so place is held apart by size, not value */
+.radio-loc{font-size:var(--fs-12);}
+
+/* ---------- actions are text ---------- */
+.go{
+  display:inline-block;margin-top:var(--space-4);
+  font-family:var(--font-body);font-size:var(--fs-16);color:var(--text-primary);
+  border:0;padding:0;text-transform:none;letter-spacing:var(--track-body);
+  transition:font-style var(--dur-fast) var(--ease-precise);
+}
+
+
+/* ---------- contact dialog ----------
+   A dark panel, like the radio: the two places on the site you operate rather
+   than read. Three fields and a consent line, nothing else — no borders, no
+   radii, and the one shadow this system permits. */
+#contact-dialog{
+  border:0;padding:0;background:transparent;
+  max-width:min(460px,calc(100vw - var(--page-margin) * 2));width:100%;
+  margin:auto;overflow:visible;
+  --focus-ring:var(--paper);
+}
+#contact-dialog::backdrop{
+  background:rgba(20,22,19,.62);
+  -webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);
+}
+#contact-dialog > form,#contact-dialog > .cdone{
+  background:var(--ink-deep);color:var(--text-inverse);
+  padding:clamp(24px,3vw,36px);
+  box-shadow:var(--shadow-overlay,0 48px 96px -32px rgba(12,14,11,.55));
+}
+.chead{display:flex;justify-content:space-between;align-items:baseline;gap:var(--space-5);}
+#contact-dialog h2{
+  font-family:var(--font-serif);font-weight:var(--weight-regular);font-size:var(--fs-26);
+  letter-spacing:var(--track-heading);line-height:var(--lh-heading);
+  color:var(--text-inverse);margin:0;
+}
+.csub{margin:var(--space-2) 0 var(--space-6);font-size:var(--fs-13);color:var(--sage);max-width:none;}
+.csub a{color:var(--paper);}
+
+.cfields{display:grid;grid-template-columns:1fr;gap:var(--space-4);}
+.cfield{display:block;}
+.cfield > span{display:block;margin-bottom:6px;font-size:var(--fs-12);color:var(--sage);}
+.cfield input,.cfield textarea{
+  display:block;width:100%;border:0;border-radius:0;
+  background:rgba(255,255,255,.07);
+  font-family:var(--font-body);font-size:var(--fs-16);line-height:1.5;
+  color:var(--paper);outline:none;
+  transition:background-color var(--dur-fast) var(--ease-precise);
+}
+.cfield input{height:42px;padding:0 var(--space-3);}
+.cfield textarea{padding:11px var(--space-3);resize:vertical;min-height:96px;}
+.cfield input:hover,.cfield textarea:hover,
+.cfield input:focus,.cfield textarea:focus{background:rgba(255,255,255,.12);}
+.cfield input:focus-visible,.cfield textarea:focus-visible{
+  outline:1.5px solid var(--focus-ring);outline-offset:2px;
+}
+
+/* the field no human sees: off-screen rather than display:none, because some
+   bots skip anything that is not rendered */
+.chp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden;}
+
+/* the consent line: a native checkbox, tinted rather than redrawn */
+.cconsent{
+  display:grid;grid-template-columns:auto 1fr;gap:var(--space-3);
+  align-items:start;margin-top:var(--space-5);cursor:pointer;
+}
+.cconsent input{
+  width:15px;height:15px;margin:2px 0 0;accent-color:var(--paper);
+  flex:none;cursor:pointer;
+}
+.cconsent span{font-size:var(--fs-12);line-height:1.5;color:var(--sage);}
+
+/* errors are stated in words, in italic serif — never in red */
+.cerror{
+  margin:var(--space-4) 0 0;font-family:var(--font-serif);font-style:italic;
+  font-size:var(--fs-16);color:var(--paper);max-width:none;
+}
+.cactions{margin-top:var(--space-6);}
+.csend,.cclose{
+  display:inline;border:0;background:none;padding:0;cursor:pointer;
+  font-family:var(--font-body);color:var(--paper);
+  background-image:linear-gradient(var(--paper),var(--paper));
+  background-repeat:no-repeat;background-position:0 100%;background-size:0% 1px;
+  padding-bottom:.14em;transition:background-size var(--dur-base) var(--ease-precise);
+}
+.csend{font-family:var(--font-serif);font-size:var(--fs-21);}
+.cclose{font-size:var(--fs-13);color:var(--sage);}
+.csend:hover,.cclose:hover{background-size:100% 1px;}
+.cdone p{margin:var(--space-3) 0 var(--space-6);color:var(--sage);font-size:var(--fs-16);}
+.cdone a{color:var(--paper);}
+
+@media (prefers-reduced-motion:no-preference){
+  #contact-dialog[open] > form,#contact-dialog[open] > .cdone{
+    animation:cIn var(--dur-slow) var(--ease-out) both;
+  }
+  @keyframes cIn{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
+}
+
+/* ---------- footer ---------- */
+footer{margin-top:clamp(96px,15vh,170px);padding-block:0 var(--space-9);background:none;border:0;}
+.fgrid{display:flex;justify-content:space-between;align-items:flex-end;gap:var(--space-7);flex-wrap:wrap;}
+@media(max-width:760px){.fgrid{flex-direction:column;align-items:flex-start;gap:var(--space-6);}}
+.fgrid h2{font-family:var(--font-serif);font-weight:var(--weight-regular);font-size:var(--fs-26);
+  letter-spacing:var(--track-heading);line-height:var(--lh-heading);max-width:24ch;
+  margin:0;color:var(--text-secondary);}
+.fcol{display:flex;flex-direction:column;gap:5px;}
+.fcol a{font-size:var(--fs-16);color:var(--text-primary);transition:font-style var(--dur-fast) var(--ease-precise);}
+
+.fcol span.v{font-size:var(--fs-13);color:var(--text-quiet);}
+.fbar{display:none;}
+
+/* ---------- motion ---------- */
+body.js .rise{opacity:0;transform:translateY(4px);transition:opacity var(--dur-slow) var(--ease-out),transform var(--dur-slow) var(--ease-out);}
+body.js .rise.in{opacity:1;transform:none;}
