@@ -511,8 +511,7 @@
       radioLine(pr) + "</header>" +
 
       '<section class="band"><h2>Selected work</h2>' +
-      '<div class="worklist">' + recent.map(workEntry).join("") + "</div>" +
-      '<span class="go-wrap"><a class="go" href="work.html">All work</a></span></section>' +
+      '<div class="worklist">' + recent.map(workEntry).join("") + "</div></section>" +
 
       '<section class="band"><div class="figures">' +
       feat.map(function (p, i) { return plate(p, i); }).join("") + "</div></section>" +
