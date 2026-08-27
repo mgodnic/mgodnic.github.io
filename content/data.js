@@ -89,13 +89,12 @@ window.SITE = {
     },
     leading: "Led a team of up to ten. Never wanted it bigger — the studio stayed boutique and worked almost entirely on referral. Camera crews, video editors, motion designers and graphic designers reported to me directly, alongside freelance crews.",
     taste: [
-      "Kinodvor most weeks — European festival cinema, which follows from studying film in Rome.",
-      "No genre loyalty in music. Most of what I find comes through NTS.",
-      "Vinyl, but only new pressings. I'm not a collector of old records.",
-      "Architecture and design books, read properly. Fiction rarely.",
+      "Cinema. European festival cinema most weeks. My favourite film is Blow-Up, by Michelangelo Antonioni.",
+      "No genre loyalty in music. Open to all good tunes. Most of what I find comes through NTS.",
+      "Architecture and design books, read properly. Fiction rarely. Favourite architect Mies van der Rohe.",
       "Long walks, which is where the ideas actually arrive.",
-      "Solo travel — Japan, Peru.",
-      "The gym, three times a week, without fail."
+      "Solo travel — USA, Japan, Peru, and many more to come.",
+      "Running, gym, and tennis. Every week."
     ],
     languages: [
       { name: "Slovenian", level: "Native" },
