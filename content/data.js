@@ -277,9 +277,7 @@ window.SITE = {
   writing: {
     years: "2011–2018",
     note: "Ten years reporting and writing, on and off, alongside everything else. Mostly music, architecture, fashion and design — interviews, profiles, opinion. Daily television news at RTV Slovenia in 2018. I still cover the DesignEuropa Awards.",
-    outlets: ["Siol.net"],
-    todo: true,
-    todoNote: "TODO — which magazines and newspapers should be named, and any links worth keeping."
+    outlets: ["Siol.net"]
   },
 
   education: [
