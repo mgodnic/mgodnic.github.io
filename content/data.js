@@ -268,9 +268,9 @@ window.SITE = {
     { from: "2018", to: "", org: "RTV Slovenia", place: "Ljubljana",
       role: "Journalist & News Reporter — contract", strand: "employment",
       note: "Daily television news for the national broadcaster." },
-    { from: "", to: "", org: "Siol.net and Slovenian magazines", place: "Ljubljana",
+    { from: "2011", to: "2016", org: "Siol.net and Slovenian magazines", place: "Ljubljana",
       role: "Journalist — music, architecture, fashion, design", strand: "employment",
-      note: "Began during my journalism degree and continued alongside everything else. TODO — years, publications, links to selected pieces.", todo: true }
+      note: "Began during my journalism degree and continued alongside everything else." }
   ],
 
   /* Journalism, 2011–2018. No images survive — this is set typographically. */
@@ -283,9 +283,9 @@ window.SITE = {
   },
 
   education: [
-    { year: "", org: "University of Ljubljana", award: "MA — Visual Communication & Film",
+    { year: "2019", org: "University of Ljubljana", award: "MA — Visual Communication & Film",
       note: "Two years of the degree taken on exchange at La Sapienza, Rome, studying visual communication and Italian cinema." },
-    { year: "", org: "University of Ljubljana", award: "BA — Journalism" }
+    { year: "2014", org: "University of Ljubljana", award: "BA — Journalism" }
   ],
 
   recognition: [
