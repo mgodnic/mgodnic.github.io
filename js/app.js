@@ -155,7 +155,9 @@
         }).then(function (r) {
           return r.json().catch(function () { return { ok: r.ok }; });
         }).then(function (body) {
-          if (body && (body.ok === false || body.success === false)) throw new Error();
+          var failed = body && (body.ok === false || body.success === false ||
+                                body.success === "false");
+          if (failed) throw new Error();
           showDone("sent");
         }).catch(function () {
           // Do not leave them at a dead end: hand the message to their own

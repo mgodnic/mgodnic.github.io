@@ -110,24 +110,25 @@ window.SITE = {
          client with everything already written. Nothing is transmitted to
          anyone, which is what the consent line on the form promises.
 
-         To have messages arrive in the inbox instead, paste an endpoint here.
-         Two that suit a static site, both free at this volume:
+         It is set to FormSubmit, which needs no account: the endpoint is the
+         address itself. The very first message sent through it triggers a
+         confirmation email — click the link in that once and every message
+         after it arrives normally. Reply goes back to the sender.
 
-           Web3Forms   https://web3forms.com  — no account, they email you an
-                       access key. Then:
-                         formEndpoint: "https://api.web3forms.com/submit",
-                         formFields: { access_key: "the-key-they-email-you" }
+         The address is visible in this file and in the built page, which is
+         no new exposure: it is already the mailto link in the footer. After
+         activating, FormSubmit offers a random-string endpoint that hides it,
+         and swapping to that is one line here.
 
-           Formspree   https://formspree.io  — needs an account. Then:
-                         formEndpoint: "https://formspree.io/f/xxxxxxxx",
-                         formFields: {}
+         Alternatives, if this one ever stops suiting:
+           Web3Forms  https://api.web3forms.com/submit  with
+                      formFields: { access_key: "..." }
+           Formspree  https://formspree.io/f/xxxxxxxx   with formFields: {}
 
-         Either way the message, the sender's name and their address are sent
-         to mitja.godnic@gmail.com, and Reply goes back to the sender. If the
-         request fails for any reason the form falls back to the mail client,
-         so a message is never lost. -------------------------------------- */
-      formEndpoint: null,
-      formFields: {},
+         If the request fails for any reason the form falls back to the
+         sender's own mail client, so a message is never lost. ------------ */
+      formEndpoint: "https://formsubmit.co/ajax/mitja.godnic@gmail.com",
+      formFields: { _captcha: "false", _template: "table" },
 
       linkedin: "https://www.linkedin.com/in/mitjagodnic/",
       instagram: "https://www.instagram.com/mitjagodnic/",
