@@ -182,16 +182,20 @@
         }).then(function (r) {
           return r.json().catch(function () { return { ok: r.ok }; });
         }).then(function (body) {
-          var failed = body && (body.ok === false || body.success === false ||
-                                body.success === "false");
-          if (failed) throw new Error();
+          var failed = !body || body.ok === false || body.success === false ||
+                       body.success === "false";
+          if (failed) throw new Error((body && body.message) || "The service refused the message.");
           showDone("sent");
-        }).catch(function () {
-          // Do not leave them at a dead end: hand the message to their own
-          // mail client instead, with everything already written.
+        }).catch(function (e) {
+          // It did not send. Say so plainly, leave everything they wrote in
+          // the form so they can try again, and never push them out to a mail
+          // program. The service's own reason goes to the console for the
+          // owner — e.g. that the address still needs activating.
+          if (window.console) console.warn("Contact form not delivered:", e && e.message);
           if (btn) { btn.disabled = false; btn.textContent = restore; }
-          openMailClient();
-          showDone("mail");
+          err.innerHTML = "That didn’t go through. Please try again in a moment, or write to " +
+            '<a href="mailto:' + esc(c.email) + '">' + esc(c.email) + "</a>.";
+          err.hidden = false;
         });
         return;
       }
