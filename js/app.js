@@ -11,11 +11,34 @@
   var visible = function () { return S.projects.filter(function (p) { return p.visible !== false; }); };
   var byId = function (id) { return S.projects.filter(function (p) { return p.id === id; })[0]; };
   var mount = function (id, html) { var el = document.getElementById(id); if (el) el.innerHTML = html; };
+  /* Fast images. optimize-images.py writes WebP copies of each original at a
+     few widths and lists them in content/images.js; the browser then picks the
+     one that suits the screen. data.js always names the original, and an image
+     with no copies yet is simply served as it is. width and height carry only
+     the proportions, so the page does not jump while pictures arrive. */
+  var IMAGES = window.IMAGES || {};
+  function imgSrc(src, sizes) {
+    var m = src && IMAGES[src];
+    if (!m) return 'src="' + esc(src) + '"';
+    var stem = "assets/opt/" + src.slice(7).replace(/\.[^.\/]+$/, "");
+    var set = m.w.map(function (w) { return encodeURI(stem + "-" + w + ".webp") + " " + w + "w"; }).join(", ");
+    var mid = m.w.filter(function (w) { return w <= 1280; }).pop() || m.w[0];
+    return 'src="' + esc(encodeURI(stem + "-" + mid + ".webp")) + '" srcset="' + esc(set) +
+      '" sizes="' + esc(sizes || "100vw") + '" width="1280" height="' + Math.round(1280 / m.r) + '"';
+  }
+  // where each kind of picture sits on the page, for the browser's choice of size
+  var SZ = {
+    plate: "(max-width: 760px) 100vw, 60vw",
+    wide: "(max-width: 760px) 100vw, 92vw",
+    photo: "(max-width: 760px) 50vw, 33vw",
+    portrait: "(max-width: 900px) 100vw, 40vw"
+  };
+
   // Plates hold photographs. Absent one, an honest mist field — no colour panel.
   var plateFig = function (src, alt, ratio, caption, credit, bg, contain, focus) {
     return '<figure><div class="plate' + (bg ? " field" : (contain ? " contain" : "")) + '" style="aspect-ratio:' + ratio +
       (bg ? ";background:" + esc(bg) : "") + '">' +
-      (src ? '<img src="' + esc(src) + '" alt="' + esc(alt || "") + '" loading="lazy"' +
+      (src ? '<img ' + imgSrc(src, SZ.plate) + ' alt="' + esc(alt || "") + '" loading="lazy"' +
         (focus ? ' style="object-position:' + esc(focus) + '"' : "") + ">" : "") + "</div>" +
       (caption ? '<figcaption class="cap">' + esc(caption) + "</figcaption>" : "") +
       (credit ? '<figcaption class="cred">' + esc(credit) + "</figcaption>" : "") + "</figure>";
@@ -28,7 +51,7 @@
     var src = item.src || item.mediaUrl || item.media_url;
     var link = item.link || item.permalink;
     if (!src) return "";
-    var img = '<img src="' + esc(src) + '" alt="' + esc(String(item.alt || "").slice(0, 120)) + '" loading="lazy">';
+    var img = '<img ' + imgSrc(src, SZ.photo) + ' alt="' + esc(String(item.alt || "").slice(0, 120)) + '" loading="lazy">';
     return link
       ? '<a class="photo" href="' + esc(link) + '" rel="noopener" target="_blank">' + img + "</a>"
       : '<span class="photo">' + img + "</span>";
@@ -376,7 +399,7 @@
                       : "https://www.youtube.com/watch?v=" + encodeURIComponent(v.id);
     var poster = v.poster || (vimeo ? "" : "https://i.ytimg.com/vi/" + v.id + "/maxresdefault.jpg");
     var still = poster
-      ? '<img src="' + esc(poster) + '" alt="' + esc(name) + '" loading="lazy">' : "";
+      ? '<img ' + imgSrc(poster, SZ.wide) + ' alt="' + esc(name) + '" loading="lazy">' : "";
 
     if (location.protocol === "file:") {
       return '<a class="embed facade" href="' + esc(watch) + '" rel="noopener" target="_blank">' +
@@ -598,22 +621,23 @@
 
     var film = p.video
       ? '<div class="embed facade" data-yt="' + esc(p.video) + '" data-title="' + esc(p.title) + '">' +
-        '<img src="' + esc(p.poster || (p.images && p.images[0]) ||
-          ("https://i.ytimg.com/vi/" + p.video + "/maxresdefault.jpg")) + '" alt="" loading="lazy">' +
+        '<img ' + imgSrc(p.poster || (p.images && p.images[0]) ||
+          ("https://i.ytimg.com/vi/" + p.video + "/maxresdefault.jpg"), SZ.wide) + ' alt="" loading="lazy">' +
         '<button class="playbtn" type="button" aria-label="Play film: ' + esc(p.title) + '">' +
         'Play film</button></div>' : "";
 
     var hero = loopFilm ? loopFilm
       : (p.images && p.images.length)
       ? '<div class="plateFull' + (p.plateBg ? " field" : (p.fit === "contain" ? " contain" : "")) + '"' +
-        (p.plateBg ? ' style="background:' + esc(p.plateBg) + '"' : "") + '><img src="' +
-        esc(p.images[0]) + '" alt="' + esc(p.title) + '"></div>'
+        (p.plateBg ? ' style="background:' + esc(p.plateBg) + '"' : "") + '><img ' +
+        imgSrc(p.images[0], SZ.wide) + ' alt="' + esc(p.title) + '" fetchpriority="high"></div>'
       : (film || '<div class="plateFull" style="aspect-ratio:3/2"></div>');
 
     var rest = (p.images || []).slice(loopFilm ? 0 : 1);
     var gal = rest.length
       ? '<div class="gallery">' + rest.map(function (src) {
-          return '<figure><img src="' + esc(src) + '" alt="' + esc(p.title) + '" loading="lazy"></figure>';
+          return '<figure><img ' + imgSrc(src, rest.length === 1 ? SZ.wide : SZ.plate) +
+            ' alt="' + esc(p.title) + '" loading="lazy"></figure>';
         }).join("") + "</div>" : "";
     if (p.images && p.images.length && film) gal = film + gal;
 
@@ -701,7 +725,7 @@
       "<div><p class='eyebrow'>Profile</p>" +
       '<h1 class="display" style="font-size:clamp(2rem,4.6vw,4rem);margin:var(--space-3) 0 var(--space-5)">' + esc(pr.name) + "</h1>" +
       pr.intro.map(function (t) { return "<p>" + esc(t) + "</p>"; }).join("") + "</div>" +
-      '<div class="portrait"><img src="' + esc(pr.portrait) + '" alt="Portrait of ' + esc(pr.name) + '"></div>' +
+      '<div class="portrait"><img ' + imgSrc(pr.portrait, SZ.portrait) + ' alt="Portrait of ' + esc(pr.name) + '"></div>' +
       "</div></header>" +
 
       '<section class="band shell"><div class="cols"><p class="eyebrow">Where I\'m from</p><div>' +
