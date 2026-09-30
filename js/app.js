@@ -11,6 +11,10 @@
   var visible = function () { return S.projects.filter(function (p) { return p.visible !== false; }); };
   var byId = function (id) { return S.projects.filter(function (p) { return p.id === id; })[0]; };
   var mount = function (id, html) { var el = document.getElementById(id); if (el) el.innerHTML = html; };
+  // Placeholder text never reaches a visitor: an empty field, or one still
+  // reading "TODO", is treated as absent and its section is left out.
+  var real = function (t) { return !!t && !/^\s*TODO\b/.test(t); };
+
   /* Fast images. optimize-images.py writes WebP copies of each original at a
      few widths and lists them in content/images.js; the browser then picks the
      one that suits the screen. data.js always names the original, and an image
@@ -322,10 +326,19 @@
        box snap would throw the page around. So the height is measured for the
        words that are about to arrive and moved to on a transition, under the
        cross-fade — the line changes depth as quietly as it changes words. */
-    var probe = h.cloneNode(true);
+    // The measuring copy is a plain div set in the headline's own type — not
+    // a clone, which would put a second <h1> on the page.
+    var probe = document.createElement("div");
+    probe.innerHTML = h.innerHTML;
     probe.setAttribute("aria-hidden", "true");
-    probe.style.cssText = "position:absolute;visibility:hidden;pointer-events:none;" +
-      "min-height:0;transition:none;left:0;top:0";
+    var cs = getComputedStyle(h);
+    ["fontFamily", "fontSize", "fontWeight", "fontStyle", "fontStretch", "fontFeatureSettings",
+     "fontKerning", "lineHeight", "letterSpacing", "wordSpacing", "textTransform", "textWrap",
+     "textWrapMode", "textWrapStyle", "hyphens"].forEach(function (k) { if (cs[k]) probe.style[k] = cs[k]; });
+    probe.style.position = "absolute"; probe.style.visibility = "hidden";
+    probe.style.pointerEvents = "none"; probe.style.left = "0"; probe.style.top = "0";
+    probe.style.margin = "0"; probe.style.padding = "0";
+    [].forEach.call(probe.querySelectorAll(".swap"), function (e) { e.style.display = "inline-block"; });
     h.parentNode.appendChild(probe);
     var pSub = probe.querySelector('[data-slot="subject"]');
     var pEnd = probe.querySelector('[data-slot="ending"]');
@@ -371,10 +384,31 @@
       }, delay);
     }
 
+    /* It turns a set number of times and then settles, on the line it opened
+       with. Moving text that never stops is hard on anyone trying to read the
+       page around it; a few turns make the point. It also holds still while
+       the pointer rests on it. turns: 0 in data.js lets it run forever. */
+    var turnsLeft = T.turns === 0 ? Infinity : (T.turns || 6);
+    var done = false;
+    var inner = advance;
+    advance = function () {
+      turnsLeft -= 1;
+      if (turnsLeft <= 0) {
+        // the last turn goes home to the opening reading, then stops for good
+        h.style.minHeight = heightOf(0, 0) + "px";
+        if (at.subject !== 0) swap(sub, T.subjects[0], 0);
+        if (at.ending !== 0) swap(end, T.endings[0], STAGGER);
+        at = { subject: 0, ending: 0 };
+        done = true; stop();
+        return;
+      }
+      inner();
+    };
+
     var timer;
     function start() {
       stop();
-      if (document.hidden) return;      // a background tab is not watching
+      if (done || document.hidden) return;   // finished, or a background tab
       timer = setInterval(advance, T.everyMs || 3000);
     }
     function stop() { if (timer) { clearInterval(timer); timer = null; } }
@@ -382,6 +416,8 @@
     document.addEventListener("visibilitychange", function () {
       document.hidden ? stop() : start();
     });
+    h.addEventListener("mouseenter", stop);
+    h.addEventListener("mouseleave", start);
     start();
   }
 
@@ -570,7 +606,7 @@
     });
     var fs = facets(list);
     return nav("work.html") + '<main id="main" class="shell">' +
-      '<section class="band" style="margin-top:clamp(72px,11vh,132px)"><h2>Selected work</h2>' +
+      '<section class="band" style="margin-top:clamp(72px,11vh,132px)"><h1 class="pagehead">Selected work</h1>' +
       '<div class="filters" role="group" aria-label="Filter by sector">' +
       '<button aria-pressed="true" data-f="all">All</button>' +
       fs.map(function (f) { return '<button aria-pressed="false" data-f="' + esc(f) + '">' + esc(f) + "</button>"; }).join("") +
@@ -597,6 +633,17 @@
         return '<div class="agroup"><h3>' + esc(g.name) + '</h3><div class="alist">' +
           g.items.map(function (i) { return "<span>" + esc(i) + "</span>"; }).join("") + "</div></div>";
       }).join("") + "</div></section>";
+  }
+
+  function writeup(p) {
+    var parts = [];
+    if (real(p.context)) parts.push(["Context", "<p>" + esc(p.context) + "</p>"]);
+    var steps = (p.approach || []).filter(real);
+    if (steps.length) parts.push(["Approach", steps.map(function (a) { return "<p>" + esc(a) + "</p>"; }).join("")]);
+    return parts.map(function (x, i) {
+      return '<section class="band"' + (i === 0 ? ' style="padding-top:clamp(30px,5vw,52px)"' : "") +
+        '><div class="cols"><p class="eyebrow">' + x[0] + "</p><div>" + x[1] + "</div></div></section>";
+    }).join("");
   }
 
   /* ---------- dossier ---------- */
@@ -646,9 +693,10 @@
           return "<dt>" + esc(c[0]) + "</dt><dd>" + esc(c[1]) + "</dd>";
         }).join("") + "</dl></div>" : "";
 
-    var outcome = (p.outcome || []).length
+    var outs = (p.outcome || []).filter(real);
+    var outcome = outs.length
       ? '<section class="band shell"><div class="cols"><p class="eyebrow">Outcome</p><div><ul class="facts">' +
-        p.outcome.map(function (o) { return "<li>" + esc(o) + "</li>"; }).join("") + "</ul></div></div></section>" : "";
+        outs.map(function (o) { return "<li>" + esc(o) + "</li>"; }).join("") + "</ul></div></div></section>" : "";
 
     var links = (p.links || []).length
       ? '<p style="margin-top:18px">' + p.links.map(function (l) {
@@ -668,10 +716,7 @@
       (p.roleDetail ? "<dt></dt><dd style='color:var(--muted)'>" + esc(p.roleDetail) + "</dd>" : "") +
       "</dl>" + credits + links + "</div></div>" +
       hero +
-      '<section class="band" style="border-top:1px solid var(--hair);padding-top:clamp(30px,5vw,52px)"><div class="cols">' +
-      '<p class="eyebrow">Context</p><div><p>' + esc(p.context) + "</p></div></div></section>" +
-      '<section class="band"><div class="cols"><p class="eyebrow">Approach</p><div>' +
-      (p.approach || []).map(function (a) { return "<p>" + esc(a) + "</p>"; }).join("") + "</div></div></section>" +
+      writeup(p) +
       (gal ? '<section class="band"><div class="cols"><p class="eyebrow">Material</p><div>' + gal + "</div></div></section>" : "") +
       outcome +
       "</article></main>" + footer();
@@ -774,7 +819,11 @@
   function lens() {
     var id = q("lens");
     var L = (S.lenses || []).filter(function (l) { return l.id === id; })[0];
-    if (!L) return nav("") + '<main class="shell band"><h2>No lens specified</h2><p>Add <code>?lens=culture</code> to the address.</p></main>' + footer();
+    // a mistyped or retired link: point home, and do not advertise the mechanism
+    if (!L) return nav("") + '<main id="main" class="shell"><header class="hero">' +
+      '<h1 class="lede">Nothing here.</h1><p class="lede lensintro">' +
+      'The portfolio is at <a href="index.html">' + esc(location.host || "the home page") + "</a>.</p>" +
+      "</header></main>" + footer();
     meta({
       title: S.profile.name + " — " + L.label,
       description: L.intro ? clamp(L.intro, 155) : null,
@@ -782,18 +831,18 @@
       robots: "noindex, nofollow"      // a lens is sent to one employer, never published
     });
     var picks = L.projects.map(byId).filter(Boolean);
-    return '<nav class="nav shell" aria-label="Primary"><a class="id" href="index.html">' + esc(S.profile.name) +
-      " <span>— " + esc(S.profile.role) + "</span></a></nav>" +
-      '<main id="main"><header class="hero shell" style="padding-bottom:clamp(28px,4vw,48px)">' +
+    return nav("") + '<main id="main" class="shell">' +
+      '<header class="hero lenshead">' +
       '<h1 class="display" style="font-size:clamp(34px,6vw,72px)">' + esc(S.profile.name) + "</h1>" +
       '<p class="role">' + esc(S.profile.role) + "</p>" +
-      '<p class="lede" style="margin-top:30px;max-width:56ch">' + esc(L.intro) + "</p></header>" +
-      '<section class="shell"><div class="plates" style="border-top:1px solid var(--hair)">' +
+      '<p class="lede">' + esc(L.intro) + "</p></header>" +
+      '<section class="band"><div class="figures">' +
       picks.map(function (p, i) { return plate(p, i); }).join("") + "</div></section>" +
-      (L.showArchive ? '<section class="band shell"><div class="cols"><p class="eyebrow">Scale</p><div><p>' +
+      (L.showArchive ? '<section class="band"><div class="cols"><p class="eyebrow">Scale</p><div><p>' +
         esc(S.archive.note) + '</p><a class="go" href="work.html#archive">The full record</a></div></div></section>' : "") +
       "</main>" + footer();
   }
+
 
   /* ---------- behaviour ---------- */
   function wire() {

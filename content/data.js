@@ -54,7 +54,10 @@ window.SITE = {
                 "execute it", "deliver it", "get it built", "realize it",
                 "make it real", "land it"],
       closing: ".",
-      everyMs: 3000
+      everyMs: 3000,
+      /* How many times it turns before settling back on the first reading.
+         Six is about eighteen seconds. 0 means it never stops. */
+      turns: 6
     },
     /* A live radio stream offered on the home page. Nothing is requested from
        NTS until someone presses the control, so the page costs nothing to
@@ -336,7 +339,6 @@ window.SITE = {
          shared link, and nothing else. */
       images: [],
       homeImage: "assets/equality_key.png",
-      assetNote: "TODO — director and DoP credits. The films are on Diskont films' own Vimeo (vimeo.com/diskont), so the production company is confirmed; the individual credits are not."
     },
 
     {
@@ -372,7 +374,6 @@ window.SITE = {
         { provider: "youtube", id: "ccrP13En2GM", title: "Opening titles, Customer Success Kick-off 2024" }
       ],
       images: ["assets/sap_key.png"],
-      assetNote: "TODO — confirm the 2021–2024 span; individual credits (motion design, direction, camera, writing); and whether the partner reportage and Quality Awards films can be added."
     },
 
     {
@@ -416,7 +417,6 @@ window.SITE = {
       video: "M1DhEM2jUIM",
       links: [["Case study", "https://dobrezgodbe.si/nacionalni-dan-stripa-kako-smo-praznemu-okvirju-dali-znacaj/"]],
       images: ["assets/nds-master.jpg"], fit: "contain",
-      assetNote: "Use the corrected slogan file. One press asset carries a typo in the slogan and must never be published."
     },
 
     {
@@ -434,10 +434,8 @@ window.SITE = {
       credits: [
         ["Band", "MRFY"]
       ],
-      context: "TODO — who directed and produced the video, and what the shoot involved.",
-      approach: [
-        "TODO — worth a line or two on what the days were actually like, since the photographs carry the rest."
-      ],
+      context: "",
+      approach: [],
       outcome: [],
       videos: [
         { provider: "youtube", id: "6j1kbWCZuJY", title: "MRFY — Tonemo, official video" }
@@ -450,7 +448,6 @@ window.SITE = {
         "assets/tonemo/05.jpg",
         "assets/tonemo/06.jpg"
       ],
-      assetNote: "TODO — confirm the photographs are yours; if so the role line should say so plainly. Director, producer and DoP credits needed."
     },
 
     {
@@ -487,7 +484,6 @@ window.SITE = {
       images: ["assets/key-images/mglc.jpg", "assets/mglc-podcast.png", "assets/mglc.png"],
       fit: "contain", plateBg: "#e5c439",
       homeImage: "assets/key-images/mglc-home.jpg",
-      assetNote: "Channel figures from the screenshot deliberately not used — undated. mglc-mac.png dropped: the same Spotify page as mglc-podcast.png, but unreadable and on a black ground. Still in assets/ if it is ever wanted."
     },
 
     {
@@ -510,7 +506,6 @@ window.SITE = {
       outcome: [],
       video: "3h5o0qgANFQ",
       images: ["assets/key-images/go2insure.png"],
-      assetNote: "TODO — confirm whether this ran through Top Stories or independently. It appears in both the studio client archive and the 2025 freelance portfolio. Motion and 3D credits also needed."
     },
 
     {
@@ -549,7 +544,6 @@ window.SITE = {
         "assets/ekultura/event-02.jpg"
       ],
       fit: "contain", plateBg: "#cd5528",
-      assetNote: "TODO — photographer credit for the launch photographs, 19 June 2026. The tote would make a stronger key image than the ministry mark; swap the first two entries to try it."
     },
 
     {
@@ -587,7 +581,6 @@ window.SITE = {
       ],
       links: [["Case study", "https://capital-h.eu/triglav_case_study/Triglav%20Case%20Study.dc.html"]],
       images: ["assets/key-images/triglav.jpg"], fit: "contain", plateBg: "#434a9a",
-      assetNote: "TODO — confirm your precise role and the other credits; the published case study names no individuals. Stills or frames from Triglav Ekspres, Naš dan or the recruitment films would lift this from a text page to a real one. The Capital H venture grew out of this relationship."
     },
 
     {
@@ -611,7 +604,6 @@ window.SITE = {
       outcome: [],
       links: [["Website", "https://www.schwarzbartlkinderlab.com/en"]],
       images: ["assets/schwarzbartl-key.png"], fit: "contain",
-      assetNote: "Key image shows the product and the symbol set rather than the raw lockups, which solves the earlier problem. The wordmark still breaks mid-word in the corner mark — re-set it before using any close-up of the logotype."
     },
 
     {
@@ -673,7 +665,6 @@ window.SITE = {
         "assets/flet/IMG_2681-45.jpg",
         "assets/flet/IMG_6357-45.jpg"
       ],
-      assetNote: "All six cropped to 4:5. Originals and IMG_1612-landscape.jpg (the earlier 3:2 key) are kept in the folder — swap the first entry back to IMG_1612-landscape.jpg if you want a landscape key again."
     }
 
   ],

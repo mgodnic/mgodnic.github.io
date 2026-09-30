@@ -27,7 +27,7 @@ To publish: upload the whole `site/` folder to any static host — Netlify, Verc
 | Hide something | Set `visible: false` |
 | Put it on the home page | Set `home: true` on four projects — the home page shows two uneven pairs |
 | Fix a bad home crop | Home plates are **cropped, not fitted**. If the key image is a lockup a crop would cut, add `homeImage: "assets/…"` — a second image used only on the home page |
-| Add images | Drop files in `assets/`, then list the paths in `images: []` |
+| Add images | Drop files in `assets/`, list the paths in `images: []`, then run `python3 optimize-images.py` (see below) |
 | Add a film | Put the YouTube id in `video:` — e.g. `video: "h6yCiE3KP_I"` |
 | Change contact, bio, taste | The `profile:` block at the top |
 | Change the words in the moving headline | `profile.thesisLive` — two lists, `subjects` and `endings`. They are combined freely, so adding one word to either list adds a whole row of new readings. `everyMs` sets the beat |
@@ -56,7 +56,14 @@ Anything with `todo: true` shows a red flag on the site so you can see what stil
 
 ## Lenses
 
-A lens is a tailored version for one application. Unlisted — nobody finds it unless you send the link.
+A lens is a tailored version for one application. Unlisted — it is linked from
+nowhere, kept out of the sitemap and marked `noindex`, so nobody stumbles on it.
+
+**Unlisted is not private.** While the GitHub repository is public, anyone who
+browses it can read every lens in `data.js`. Don't write anything in a lens you
+wouldn't want the wrong employer to read. Real privacy needs a private
+repository (GitHub Pro, or a host such as Cloudflare Pages that publishes from
+one for free).
 
 Three exist already: `culture`, `design`, `corporate`.
 
@@ -70,18 +77,6 @@ To make a new one, copy a block in `lenses:` and list the project ids you want, 
 
 ---
 
-## Still needed
-
-- Photographs of the Muzej norosti identity in use — only the concept deck exists
-- A proper shoot of the flat — the 23 phone snapshots aren't publishable
-- Comics Day posters, installations and DOOH at full resolution
-- e-Kultura tote and one-pagers exported as images
-- The corrected Comics Day slogan file. **The press asset reads IMAM KATAKTER and must never go up**
-- Never publish `Gemini_Generated_Image_p852byp852byp852.png` as a photograph of the flat
-- schwarzbartl lockups re-set before that project can be shown
-- Confirm the RTV Slovenia years, the ICE years, and whether the Rome MA was awarded by Sapienza
-- Confirm the SOF Silver year and category
-
 ## Metadata, favicon and sharing
 
 The mark is an **M set in Shippori Mincho**, the site's own serif — a letterform, not a drawn logo, which is the only kind of mark the design system allows.
@@ -92,7 +87,7 @@ assets/meta/icon.svg      the same M as a real outline — crisp at any size
 assets/meta/icon-180.png  apple-touch-icon, for a home-screen bookmark
 assets/meta/icon-192.png  ·  icon-512.png   for the web manifest
 assets/meta/og.jpg        1200×630 — the card people see when the link is pasted.
-                          Cropped from assets/mitja_cropped.JPG, with the crop
+                          Cropped from mitja_cropped.JPG (now in ../site-archive), with the crop
                           taken off the bottom so the head is never clipped.
 assets/meta/og-typographic.jpg   the earlier name-and-thesis card, kept in case
 site.webmanifest · robots.txt · sitemap.xml
@@ -146,8 +141,48 @@ Three things it does quietly:
 - **It says one thing to a screen reader.** The heading carries `profile.thesis`
   as its accessible name, so assistive technology announces a single steady
   sentence instead of narrating every swap.
+- **It settles.** It turns six times — about eighteen seconds — then returns
+  to the reading it opened with and stays there. Text that never stops moving
+  is hard on anyone reading the page around it. It also holds still while the
+  pointer rests on it. `turns` in `profile.thesisLive` sets the count; `0`
+  lets it run forever.
 - **It stops when nobody is looking** — on a background tab, and for anyone who
   has asked their system for less motion.
+
+---
+
+## Images
+
+Every image is served as a right-sized WebP: a phone gets a 640px file, a big
+retina screen a 2560px one. `data.js` always names your original; the fast
+copies live in `assets/opt/` and are listed in `content/images.js`.
+
+**After adding or replacing an image, run:**
+
+```bash
+cd /Users/mitjagodnic/CV/site && python3 optimize-images.py
+```
+
+It only processes new or changed files. It needs Pillow once:
+`pip3 install pillow`. If you forget to run it, nothing breaks — the new image
+is simply served as it is, heavier, until the next run.
+
+Quality is set high on purpose (90–95). Several images are film stills with
+grain over soft backdrops, and lower settings smooth the grain away and leave
+visible bands in the gradient.
+
+---
+
+## Private notes
+
+Notes about missing credits, unconfirmed facts and files never to publish live
+in **`CV/NOTES-private.md`**, outside this folder — so they are never uploaded.
+Keep them there, not in `data.js`: everything in this folder is readable by
+anyone, through the page source or on GitHub.
+
+The renderer also refuses to show any field that still starts with `TODO`, so a
+placeholder left in `data.js` leaves its section out rather than appearing on
+the page.
 
 ---
 
@@ -177,8 +212,15 @@ site/
   css/site.css         ← design system
   js/app.js            ← renderer
   assets/              ← images
+  assets/opt/          ← fast WebP copies, made by optimize-images.py
   assets/meta/         ← icons and the sharing card
+  content/images.js    ← written by optimize-images.py; do not edit
   favicon.ico · site.webmanifest · robots.txt · sitemap.xml
+  optimize-images.py   ← run after adding images
   set-domain.sh        ← run once, when you have a domain
-  wireframes.html      ← the approved architecture document
+
+Outside this folder, never published:
+  ../NOTES-private.md  ← your private notes
+  ../site-archive/     ← retired files and unused images, kept not deleted
+  ../_backups/         ← dated archives of the site
 ```

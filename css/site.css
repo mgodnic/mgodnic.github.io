@@ -192,7 +192,9 @@ h1.display,h1.lede{
 }
 p.lede{font-size:var(--fs-18);line-height:var(--lh-dense);color:var(--text-secondary);
   max-width:var(--measure-prose);}
-h2{
+/* h1.pagehead: a page's title set at section size, where the page is a list
+   and a display-size title would only push the work down */
+h2,h1.pagehead{
   font-family:var(--font-serif);font-weight:var(--weight-regular);font-size:var(--fs-26);
   letter-spacing:var(--track-heading);line-height:var(--lh-heading);
   color:var(--text-secondary);margin:0 0 var(--space-6);
@@ -211,6 +213,9 @@ p{margin:0 0 var(--space-4);max-width:var(--measure-prose);font-size:var(--fs-16
 /* ---------- home ---------- */
 .hero{padding-block:clamp(56px,9vh,112px) 0;}
 .hero .role,.hero .thesis{display:none;}
+/* A lens is sent to one employer: it says who and what before anything else */
+.lenshead .role{display:block;margin:var(--space-3) 0 0;font-size:var(--fs-16);color:var(--text-quiet);}
+.lenshead .lede{margin-top:var(--space-6);max-width:var(--measure-prose);}
 .intro{display:grid;grid-template-columns:var(--split-main) var(--split-aside);
   gap:var(--gap-column);margin-top:var(--space-7);align-items:start;}
 @media(max-width:860px){.intro{grid-template-columns:1fr;gap:var(--space-6);}}
@@ -262,10 +267,14 @@ p{margin:0 0 var(--space-4);max-width:var(--measure-prose);font-size:var(--fs-16
 /* Two uneven pairs — wide/narrow, then narrow/wide. Four works without ever
    becoming the even grid of equal thumbnails the system rules out. */
 .figures{display:grid;grid-template-columns:repeat(12,1fr);gap:clamp(24px,3vw,52px) clamp(20px,3vw,44px);margin-top:var(--space-3);}
-.figures > *:nth-child(1){grid-column:span 7;}
-.figures > *:nth-child(2){grid-column:span 5;}
-.figures > *:nth-child(3){grid-column:span 5;}
-.figures > *:nth-child(4){grid-column:span 7;}
+.figures > *:nth-child(4n+1){grid-column:span 7;}
+.figures > *:nth-child(4n+2){grid-column:span 5;}
+.figures > *:nth-child(4n+3){grid-column:span 5;}
+.figures > *:nth-child(4n+4){grid-column:span 7;}
+/* Any number of figures: the uneven pairs repeat, and one left without a
+   partner runs the full width as a landscape rather than a lone narrow tile. */
+.figures > *:nth-child(odd):last-child{grid-column:1 / -1;}
+.figures > *:nth-child(odd):last-child .plate{aspect-ratio:3 / 2 !important;}
 @media(max-width:760px){.figures{grid-template-columns:1fr;}.figures > *{grid-column:auto !important;}}
 /* On the home page the plates are cropped, not fitted — full-bleed imagery,
    whatever a project does on its own page. */
@@ -421,6 +430,13 @@ body[data-todo="off"] .todo,body[data-todo="off"] .todo-row{display:none;}
   transition:opacity var(--dur-base) var(--ease-precise);}
 .photo:hover img{opacity:.8;}
 .photo-grid:empty{display:none;}
+
+/* On a touchscreen the nav's small type gets a finger-sized target — about
+   34px tall — without changing how it looks. */
+@media (pointer: coarse){
+  .nav a{position:relative;}
+  .nav a::after{content:"";position:absolute;inset:-10px -4px;}
+}
 
 /* ---------- hover: an underline wiping open from the left ----------
    A gradient background rather than text-decoration, because background-size
