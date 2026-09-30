@@ -166,10 +166,9 @@
         payload.name = name;
         payload.email = email;
         payload.message = message;
-        // the two spellings the common providers read for the subject line,
-        // and the two they read to make Reply go back to the sender
-        payload.subject = payload._subject = "Portfolio — message from " + name;
-        payload.replyto = payload._replyto = email;
+        // the subject line, and Reply going straight back to the sender
+        payload.subject = "Portfolio — message from " + name;
+        payload.replyto = email;
 
         var btn = form.querySelector(".csend");
         var restore = btn ? btn.textContent : "";

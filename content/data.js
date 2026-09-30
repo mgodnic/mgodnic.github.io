@@ -108,29 +108,19 @@ window.SITE = {
       email: "mitja.godnic@gmail.com",
 
       /* ---- where the form sends ----------------------------------------
-         Leave formEndpoint null and submitting opens the sender's own mail
-         client with everything already written. Nothing is transmitted to
-         anyone, which is what the consent line on the form promises.
+         Messages go through Web3Forms, which forwards them to the address
+         the access key was issued for. No account, no password: the key is
+         emailed to you from https://web3forms.com and is meant to sit in a
+         public page — it can only send mail to you, never read anything.
 
-         It is set to FormSubmit, which needs no account: the endpoint is the
-         address itself. The very first message sent through it triggers a
-         confirmation email — click the link in that once and every message
-         after it arrives normally. Reply goes back to the sender.
+         To set up or replace it: get a key at web3forms.com for
+         mitja.godnic@gmail.com and paste it between the quotes below.
 
-         The address is visible in this file and in the built page, which is
-         no new exposure: it is already the mailto link in the footer. After
-         activating, FormSubmit offers a random-string endpoint that hides it,
-         and swapping to that is one line here.
-
-         Alternatives, if this one ever stops suiting:
-           Web3Forms  https://api.web3forms.com/submit  with
-                      formFields: { access_key: "..." }
-           Formspree  https://formspree.io/f/xxxxxxxx   with formFields: {}
-
-         If the request fails for any reason the form falls back to the
-         sender's own mail client, so a message is never lost. ------------ */
-      formEndpoint: "https://formsubmit.co/ajax/mitja.godnic@gmail.com",
-      formFields: { _captcha: "false", _template: "table" },
+         If a message can't be delivered, the visitor is told so plainly,
+         keeps what they wrote, and is given this address to write to instead.
+         (FormSubmit was used first and went down; it is not coming back.) */
+      formEndpoint: "https://api.web3forms.com/submit",
+      formFields: { access_key: "", from_name: "Portfolio contact form" },
 
       linkedin: "https://www.linkedin.com/in/mitjagodnic/",
       instagram: "https://www.instagram.com/mitjagodnic/",
