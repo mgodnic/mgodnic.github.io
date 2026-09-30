@@ -350,6 +350,19 @@ ul.plain li{margin-bottom:var(--space-2);}
 .facts li{background:none;padding:var(--space-3) 0;font-size:var(--fs-16);
   line-height:var(--lh-dense);color:var(--text-secondary);}
 
+/* ---------- Work: the picture beside the pointer ----------
+   A plate that floats beside the pointer while it rests on a project. No
+   border, no shadow — the picture is the edge. It sits under the sticky nav. */
+.wpeek{
+  position:fixed;left:0;top:0;z-index:150;pointer-events:none;
+  background:var(--surface-plate);opacity:0;
+  transition:opacity var(--dur-fast) var(--ease-precise);
+  will-change:transform,opacity;
+}
+.wpeek.on{opacity:1;}
+.wpeek img{display:block;width:100%;height:100%;object-fit:cover;}
+@media (hover:none), (pointer:coarse){ .wpeek{display:none;} }
+
 /* ---------- the record ----------
    The last section of Work, not a page of its own. Separated from the
    selection above it by a field of space, and set quieter, so it reads as

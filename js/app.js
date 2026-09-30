@@ -293,6 +293,80 @@
         p.plateBg, p.fit === "contain", p.homeFocus) + "</a>";
   }
 
+  /* ---------- Work: a picture beside the pointer ----------
+     On a device that can hover, pointing at a project in the list brings up its
+     picture beside the pointer, following it gently down the list. Touchscreens
+     have no hover, so they keep the plain list. The picture is decoration — the
+     list says everything — so it is hidden from assistive technology. */
+  function wirePeek() {
+    var list = document.getElementById("worklist");
+    if (!list || !window.matchMedia("(hover: hover) and (pointer: fine)").matches) return;
+    var still = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    var box = document.createElement("div");
+    box.className = "wpeek"; box.setAttribute("aria-hidden", "true");
+    var img = document.createElement("img"); img.alt = ""; box.appendChild(img);
+    document.body.appendChild(box);
+
+    var LONG = 380, EDGE = 16;
+    var w = 0, h = 0, tx = 0, ty = 0, x = 0, y = 0, on = false, raf = 0, warmed = false;
+
+    function size(row) {
+      var r = parseFloat(row.getAttribute("data-r")) || 1.5;
+      w = r >= 1 ? LONG : Math.round(LONG * r);
+      h = r >= 1 ? Math.round(LONG / r) : LONG;
+      box.style.width = w + "px"; box.style.height = h + "px";
+      box.style.background = row.getAttribute("data-bg") || "";
+      img.style.objectFit = row.getAttribute("data-bg") ? "contain" : "cover";
+    }
+    var row0 = null;
+    function aim(px) {
+      // Never over the row being pointed at: its title and line stay readable.
+      // The picture sits just below that row — or above it near the bottom of
+      // the window — and follows the pointer sideways, inside the window.
+      var W = window.innerWidth, H = window.innerHeight;
+      var b = row0.getBoundingClientRect();
+      tx = Math.min(Math.max(px - w * 0.3, EDGE), W - EDGE - w);
+      ty = b.bottom + 10 + h <= H - EDGE ? b.bottom + 10 : Math.max(EDGE, b.top - 10 - h);
+    }
+    function frame() {
+      x += (tx - x) * (still ? 1 : 0.22);
+      y += (ty - y) * (still ? 1 : 0.22);
+      box.style.transform = "translate(" + x.toFixed(1) + "px," + y.toFixed(1) + "px)";
+      raf = on && (Math.abs(tx - x) > 0.3 || Math.abs(ty - y) > 0.3) ? requestAnimationFrame(frame) : 0;
+    }
+    function nudge() { if (!raf) raf = requestAnimationFrame(frame); }
+    function show(row, px, py, jump) {
+      var url = row.getAttribute("data-peek");
+      // a narrow window has no room beside the list: the picture would sit on it
+      if (!url || window.innerWidth < 900) { hide(); return; }
+      if (img.getAttribute("src") !== url) img.src = url;
+      row0 = row; size(row); aim(px);
+      if (!on || jump) { x = tx; y = ty; }   // appear where it belongs, then follow
+      on = true; box.classList.add("on"); nudge();
+    }
+    function hide() { on = false; box.classList.remove("on"); }
+
+    list.addEventListener("pointerenter", function () {
+      if (warmed) return; warmed = true;      // fetch every picture once, so none arrive late
+      [].forEach.call(list.querySelectorAll("[data-peek]"), function (a) {
+        var i = new Image(); i.src = a.getAttribute("data-peek");
+      });
+    });
+    [].forEach.call(list.querySelectorAll(".wentry"), function (row) {
+      row.addEventListener("pointerenter", function (e) { show(row, e.clientX, e.clientY); });
+      row.addEventListener("pointermove", function (e) { if (on && row0 === row) { aim(e.clientX); nudge(); } });
+      // keyboard: the picture sits at the row's right, level with it
+      row.addEventListener("focus", function () {
+        if (!row.matches(":focus-visible")) return;
+        var b = row.getBoundingClientRect();
+        show(row, b.left + b.width * 0.55, b.top + b.height / 2, true);
+      });
+      row.addEventListener("blur", hide);
+    });
+    list.addEventListener("pointerleave", hide);
+    window.addEventListener("scroll", function () { if (on && !list.matches(":hover")) hide(); }, { passive: true });
+  }
+
   /* ---------- the living thesis ----------
      Two words in the opening line change every few seconds. The heading keeps
      a fixed accessible name, so assistive technology reads one stable sentence
@@ -595,9 +669,24 @@
     return Object.keys(set).sort();
   }
 
+  // The picture a Work row shows on hover: the crop-friendly home image if the
+  // project has one, else its lead image — as a fast copy no wider than 1280.
+  function peekOf(p) {
+    var src = p.homeImage || (p.images && p.images[0]);
+    if (!src) return "";
+    var m = IMAGES[src], url = src, r = "";
+    if (m) {
+      var w = m.w.filter(function (x) { return x <= 1280; }).pop() || m.w[0];
+      url = encodeURI("assets/opt/" + src.slice(7).replace(/\.[^.\/]+$/, "") + "-" + w + ".webp");
+      r = m.r;
+    }
+    return ' data-peek="' + esc(url) + '" data-r="' + r + '"' +
+      (p.plateBg && !p.homeImage ? ' data-bg="' + esc(p.plateBg) + '"' : "");
+  }
+
   function workEntry(p) {
-    return '<a class="wentry rise" data-sectors="' + esc((p.sectors || []).join(" ")) +
-      '" href="project.html?p=' + encodeURIComponent(p.id) + '">' +
+    return '<a class="wentry rise" data-sectors="' + esc((p.sectors || []).join(" ")) + '"' + peekOf(p) +
+      ' href="project.html?p=' + encodeURIComponent(p.id) + '">' +
       '<span class="wt"><span class="u">' + esc(p.title) + "</span></span>" +
       '<span class="wd">' + esc(p.premise || "") + "</span>" +
       '<span class="wy">' + esc(p.years || p.year || "") + "</span></a>";
@@ -934,6 +1023,7 @@
     wireContact();
     wireThesis();
     wireRadio();
+    wirePeek();
     // The page is rendered after the browser has already handled the URL hash,
     // so an anchor arriving with the request has nothing to scroll to yet.
     if (location.hash.length > 1) {
