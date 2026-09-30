@@ -1,6 +1,32 @@
 # The site
 
-No build step, no framework, no dependencies. Open `index.html` in a browser and it runs.
+No framework and no dependencies for visitors: every page is plain HTML that
+also builds itself live in the browser from `content/data.js`.
+
+## Publishing — always build first
+
+```bash
+cd /Users/mitjagodnic/CV/site && ../.venv/bin/python build.py
+```
+
+Then commit and push. The build takes about two seconds and does five things:
+
+1. makes fast WebP copies of any new or changed image
+2. makes a 1200×630 share card for every project, for link previews
+3. writes each page's content into its HTML file, so search engines, link
+   previews and AI assistants read the real page instead of an empty one —
+   and gives every project its own page, `work-<id>.html`
+4. stamps the CSS and JavaScript links so browsers fetch new versions
+5. rewrites `sitemap.xml`
+
+The pages are rendered by the site's own `js/app.js`, run in the Mac's built-in
+JavaScript engine — so what a crawler reads is exactly what a visitor sees.
+
+**If you ever publish without building,** nothing breaks for visitors — their
+browsers still build every page from `data.js`. Only link previews, search
+engines and AI readers keep the previous version until the next build.
+
+Running it twice changes nothing, so it is always safe to run.
 
 **But use the local server when you want to check it properly.** Opening a file straight from disk gives the page no origin, and YouTube refuses to load a player on it — that is the "Napaka 153" error. The site handles this (pressing play opens the film on YouTube instead), but embeds, and anything else origin-dependent, only behave as they will in production when served:
 
@@ -12,7 +38,7 @@ Then open http://localhost:8899
 
 **After editing `content/data.js`, hard-reload** — `Cmd+Shift+R` on macOS. The browser caches it aggressively, and a normal refresh will show you the old content. If a change of yours seems not to have taken effect, that is almost always why.
 
-To publish: upload the whole `site/` folder to any static host — Netlify, Vercel, GitHub Pages, or plain FTP. Nothing needs compiling.
+It is published on GitHub Pages from `github.com/mgodnic/mgodnic.github.io`. Any static host would do: upload the folder after building.
 
 ---
 
@@ -27,7 +53,7 @@ To publish: upload the whole `site/` folder to any static host — Netlify, Verc
 | Hide something | Set `visible: false` |
 | Put it on the home page | Set `home: true` on four projects — the home page shows two uneven pairs |
 | Fix a bad home crop | Home plates are **cropped, not fitted**. If the key image is a lockup a crop would cut, add `homeImage: "assets/…"` — a second image used only on the home page |
-| Add images | Drop files in `assets/`, list the paths in `images: []`, then run `python3 optimize-images.py` (see below) |
+| Add images | Drop files in `assets/`, list the paths in `images: []`, then build |
 | Add a film | Put the YouTube id in `video:` — e.g. `video: "h6yCiE3KP_I"` |
 | Change contact, bio, taste | The `profile:` block at the top |
 | Change the words in the moving headline | `profile.thesisLive` — two lists, `subjects` and `endings`. They are combined freely, so adding one word to either list adds a whole row of new readings. `everyMs` sets the beat |
@@ -108,13 +134,11 @@ out in full, with a placeholder until you have the real address:
 That rewrites the canonical links, every OG and Twitter tag, the sitemap,
 robots.txt and the JSON-LD in one pass. Safe to run twice.
 
-**A limit worth knowing.** Project pages are one file with a query string
-(`project.html?p=tonemo`). The browser tab, bookmarks and Google all get the
-project's own title, description and lead image, because they run the page's
-JavaScript. Facebook, LinkedIn, Slack and WhatsApp do not — a shared project
-link previews with the site card instead. That is correct, not broken. If you
-ever want per-project previews, that is the one thing that needs a real host
-with pre-rendering, rather than plain static files.
+**Every project has its own share preview.** Each project is its own page,
+`work-<id>.html`, with its own title, description and a 1200×630 card cut from
+its lead image (`assets/opt/og/<id>.jpg`) — so a Tonemo link shows the bonfire
+in iMessage, Slack or LinkedIn, and the site card is reserved for the home page.
+Old `project.html?p=<id>` links forward to the new pages.
 
 Lenses are `noindex, nofollow` and blocked in robots.txt. They stay unlisted.
 
@@ -157,15 +181,10 @@ Every image is served as a right-sized WebP: a phone gets a 640px file, a big
 retina screen a 2560px one. `data.js` always names your original; the fast
 copies live in `assets/opt/` and are listed in `content/images.js`.
 
-**After adding or replacing an image, run:**
-
-```bash
-cd /Users/mitjagodnic/CV/site && python3 optimize-images.py
-```
-
-It only processes new or changed files. It needs Pillow once:
-`pip3 install pillow`. If you forget to run it, nothing breaks — the new image
-is simply served as it is, heavier, until the next run.
+**The build makes them** (`optimize-images.py`, called by `build.py`). It only
+processes new or changed files, and uses the image library in `../.venv`. If an
+image is published before a build, nothing breaks — it is simply served as it
+is, heavier, until the next one.
 
 Quality is set high on purpose (90–95). Several images are film stills with
 grain over soft backdrops, and lower settings smooth the grain away and leave
@@ -206,20 +225,25 @@ lands in the right place. It is out of the sitemap and marked `noindex`.
 
 ```
 site/
-  index.html · work.html · project.html · profile.html · for.html
+  index.html · work.html · video.html · profile.html · for.html
+  work-<id>.html       ← one page per project, written by build.py
+  project.html         ← forwards old ?p= links to the project pages
   archive.html         ← a redirect to work.html#archive, for links already sent
   content/data.js      ← the only file you edit
   css/site.css         ← design system
   js/app.js            ← renderer
   assets/              ← images
-  assets/opt/          ← fast WebP copies, made by optimize-images.py
+  assets/opt/          ← fast WebP copies, made by the build
+  assets/opt/og/       ← a share card per project, made by the build
   assets/meta/         ← icons and the sharing card
   content/images.js    ← written by optimize-images.py; do not edit
   favicon.ico · site.webmanifest · robots.txt · sitemap.xml
-  optimize-images.py   ← run after adding images
+  build.py             ← run before every publish
+  optimize-images.py   ← the image step of the build
   set-domain.sh        ← run once, when you have a domain
 
 Outside this folder, never published:
+  ../.venv/            ← the build's image library (Pillow)
   ../NOTES-private.md  ← your private notes
   ../site-archive/     ← retired files and unused images, kept not deleted
   ../_backups/         ← dated archives of the site

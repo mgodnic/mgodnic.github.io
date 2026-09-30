@@ -684,5 +684,7 @@ footer{margin-top:clamp(96px,15vh,170px);padding-block:0 var(--space-9);backgrou
 .fbar{display:none;}
 
 /* ---------- motion ---------- */
-body.js .rise{opacity:0;transform:translateY(4px);transition:opacity var(--dur-slow) var(--ease-out),transform var(--dur-slow) var(--ease-out);}
-body.js .rise.in{opacity:1;transform:none;}
+/* .js is set on <html> before the first paint (see each page's head), so
+   pages that arrive already written out never flash before animating in */
+.js .rise{opacity:0;transform:translateY(4px);transition:opacity var(--dur-slow) var(--ease-out),transform var(--dur-slow) var(--ease-out);}
+.js .rise.in{opacity:1;transform:none;}

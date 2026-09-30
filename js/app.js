@@ -9,6 +9,8 @@
   };
   var q = function (k) { return new URLSearchParams(location.search).get(k); };
   var visible = function () { return S.projects.filter(function (p) { return p.visible !== false; }); };
+  // Each project has its own page, written out by build.py.
+  var projectUrl = function (id) { return "work-" + encodeURIComponent(id) + ".html"; };
   var byId = function (id) { return S.projects.filter(function (p) { return p.id === id; })[0]; };
   var mount = function (id, html) { var el = document.getElementById(id); if (el) el.innerHTML = html; };
   // Placeholder text never reaches a visitor: an empty field, or one still
@@ -288,7 +290,7 @@
   function plate(p, i) {
     var ratio = [ "3 / 2", "4 / 5", "4 / 5", "3 / 2" ][i % 4] || "3 / 2";
     var src = p.homeImage || ((p.images && p.images.length) ? p.images[0] : null);
-    return '<a href="project.html?p=' + encodeURIComponent(p.id) + '" class="rise">' +
+    return '<a href="' + projectUrl(p.id) + '" class="rise">' +
       plateFig(src, p.title, ratio, p.title + (p.year ? ", " + p.year : ""), p.clientEn || p.client,
         p.plateBg, p.fit === "contain", p.homeFocus) + "</a>";
   }
@@ -686,7 +688,7 @@
 
   function workEntry(p) {
     return '<a class="wentry rise" data-sectors="' + esc((p.sectors || []).join(" ")) + '"' + peekOf(p) +
-      ' href="project.html?p=' + encodeURIComponent(p.id) + '">' +
+      ' href="' + projectUrl(p.id) + '">' +
       '<span class="wt"><span class="u">' + esc(p.title) + "</span></span>" +
       '<span class="wd">' + esc(p.premise || "") + "</span>" +
       '<span class="wy">' + esc(p.years || p.year || "") + "</span></a>";
@@ -740,14 +742,15 @@
 
   /* ---------- dossier ---------- */
   function project() {
-    var p = byId(q("p")) || visible()[0];
+    var p = byId(document.body.dataset.project || q("p")) || visible()[0];
     if (!p) return nav("work.html") + '<main class="shell band"><h2>Not found</h2></main>' + footer();
+    // The share image and its size are written into this page's head by
+    // build.py; setting them again here would only make Google and the link
+    // previews disagree.
     meta({
       title: p.title + " — " + S.profile.name,
       description: p.premise || (p.role + ", " + p.client + ", " + p.year + "."),
-      url: location.href.split("#")[0],
-      image: ((p.images && p.images[0]) || p.homeImage || null),
-      imageAlt: p.title + (p.client && p.title.indexOf(p.client) < 0 ? ", " + p.client : "")
+      url: location.href.split("#")[0].split("?")[0]
     });
 
     // A series of films: stacked embeds, each captioned with what it is.
@@ -1015,6 +1018,8 @@
   }
 
   var views = { home: home, work: work, project: project, profile: profile, video: videoPage, lens: lens };
+  // build.py calls this to write each page's HTML into its file.
+  window.SiteRender = function (view) { return (views[view] || home)() + contactDialog(); };
   document.addEventListener("DOMContentLoaded", function () {
     document.body.classList.add("js");
     var v = document.body.dataset.view;
